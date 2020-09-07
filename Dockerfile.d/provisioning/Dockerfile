@@ -1,4 +1,4 @@
-# See: https://github.com/mazgi/dockerfiles/blob/master/Dockerfile.d/provisioning/Dockerfile
+# See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile
 FROM debian:10
 
 # Set in non-interactive mode.
