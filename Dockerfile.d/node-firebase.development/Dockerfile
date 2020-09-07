@@ -25,5 +25,3 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
 # see also: man 7 debconf
 ENV DEBIAN_FRONTEND=
-
-# dummy
