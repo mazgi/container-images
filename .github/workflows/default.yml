@@ -46,7 +46,7 @@ jobs:
           | .[]' 
           $HOME/files_{added,modified}.json
       - name: loop entries
-        run: >
+        run: |
           for context in $(jq --raw-output --slurp '[.[][]] 
           | map(select(. | match("^Dockerfile\\.d/"))) 
           | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
