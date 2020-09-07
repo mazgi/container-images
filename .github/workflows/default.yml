@@ -9,4 +9,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      - name: Install Docker for Mac
+        run: brew install docker
+        if: runner.os == 'macOS'
       - run: docker build Dockerfile.d/node-firebase.development
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+      - name: test
+        run: |
+          cat $HOME/files.json
+          cat $HOME/files_modified.json
+          cat $HOME/files_added.json
+          cat $HOME/files_removed.json
+          echo '${{ steps.file_changes.outputs.files}}'
+          echo '${{ steps.file_changes.outputs.files_modified}}'
+          echo '${{ steps.file_changes.outputs.files_added}}'
+          echo '${{ steps.file_changes.outputs.files_removed}}'
