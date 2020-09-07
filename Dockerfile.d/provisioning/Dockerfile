@@ -1,4 +1,5 @@
-FROM debian:buster
+# See: https://github.com/mazgi/dockerfiles/blob/master/Dockerfile.d/provisioning/Dockerfile
+FROM debian:10
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,6 +9,7 @@ ARG UID=0
 ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
+ENV ANSIBLE_VERSION=2.9.12
 ENV TERRAFORM_VERSION=0.12.9
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
@@ -17,7 +19,9 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes locales procps dialog\
   && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen\
   && locale-gen\
-  && apt-get install --assume-yes sudo apt-utils curl dnsutils git tmux zsh jq unzip\
+  #
+  # Install basic packages
+  && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
   && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 software-properties-common\
   # 
   # Install Docker CLI
@@ -39,6 +43,10 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # Install Terraform
   && curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip\
   && unzip -d /usr/local/bin/ /tmp/terraform.zip\
+  #
+  # Install Ansible
+  && apt-get install --assume-yes python3-pip python3-setuptools\
+  && pip3 install ansible==${ANSIBLE_VERSION} ansible-lint\
   # 
   # Create a user for development
   && addgroup --gid ${GID} developer || true\
