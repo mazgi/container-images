@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         # See: https://github.com/actions/virtual-environments
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
           | map(select(. | match("^Dockerfile\\.d/"))) 
           | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
           | unique 
-          | .[]' 
+          | .[]' \
           $HOME/files_{added,modified}.json)
           do
             echo "CONTEXT: $context"
