@@ -32,16 +32,31 @@ jobs:
           echo '${{ steps.file_changes.outputs.files_removed}}'
       - name: test for file_changes_space
         run: |
-          echo '${{ steps.file_changes_space.outputs.files}}'
           echo '${{ steps.file_changes_space.outputs.files_modified}}'
           echo '${{ steps.file_changes_space.outputs.files_added}}'
-          echo '${{ steps.file_changes_space.outputs.files_removed}}'
-      # Thanks:
-      # - https://github.com/stedolan/jq/issues/805#issuecomment-109783967
-      # - https://stedolan.github.io/jq/manual/
       - name: merge json files
         run: |
-          jq --slurp '[.[][]]' $HOME/files_{added,modified}.json
+          jq --raw-output --slurp '[.[][]] | map(select(. | match("^Dockerfile\\.d/"))) | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) | unique | .[]' files_added.json files_modified.json
+      - name: merge json files
+        run: >
+          jq --raw-output --slurp '[.[][]] 
+          | map(select(. | match("^Dockerfile\\.d/"))) 
+          | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
+          | unique 
+          | .[]' 
+          files_added.json files_modified.json
+      - name: loop entries
+        run: >
+          for context in $(jq --raw-output --slurp '[.[][]] 
+          | map(select(. | match("^Dockerfile\\.d/"))) 
+          | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
+          | unique 
+          | .[]' 
+          files_added.json files_modified.json)
+          do
+            echo "CONTEXT: $context"
+            docker build $context
+          done
       - name: loop
         run: |
           for f in '${{ steps.file_changes_space.outputs.files_modified}}' '${{ steps.file_changes_space.outputs.files_added}}'
