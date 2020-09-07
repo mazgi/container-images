@@ -5,6 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
+        # See: https://github.com/actions/virtual-environments
         os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     steps:
@@ -14,8 +15,12 @@ jobs:
       #   if: runner.os == 'macOS'
       - run: docker build Dockerfile.d/node-firebase.development
       - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-      - name: test
+        uses: trilom/file-changes-action@v1.2.4
+      - id: file_changes_space
+        uses: trilom/file-changes-action@v1.2.4
+        with:
+          output: " "
+      - name: test for file_changes
         run: |
           cat $HOME/files.json
           cat $HOME/files_modified.json
@@ -25,3 +30,24 @@ jobs:
           echo '${{ steps.file_changes.outputs.files_modified}}'
           echo '${{ steps.file_changes.outputs.files_added}}'
           echo '${{ steps.file_changes.outputs.files_removed}}'
+      - name: test for file_changes_space
+        run: |
+          echo '${{ steps.file_changes_space.outputs.files}}'
+          echo '${{ steps.file_changes_space.outputs.files_modified}}'
+          echo '${{ steps.file_changes_space.outputs.files_added}}'
+          echo '${{ steps.file_changes_space.outputs.files_removed}}'
+      # Thanks:
+      # - https://github.com/stedolan/jq/issues/805#issuecomment-109783967
+      # - https://stedolan.github.io/jq/manual/
+      - name: merge json files
+        run: |
+          jq --slurp '[.[][]]' $HOME/files_{added,modified}.json
+      - name: loop
+        run: |
+          for f in '${{ steps.file_changes_space.outputs.files_modified}}' '${{ steps.file_changes_space.outputs.files_added}}'
+          do
+            echo "<< $f >>"
+            if [[ "$f" =~ ^#Dockerfile.d/ ]]; then
+              echo "<<< $f >>>"
+            fi
+          done
