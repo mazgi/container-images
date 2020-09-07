@@ -36,7 +36,7 @@ jobs:
           echo '${{ steps.file_changes_space.outputs.files_added}}'
       - name: merge json files
         run: |
-          jq --raw-output --slurp '[.[][]] | map(select(. | match("^Dockerfile\\.d/"))) | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) | unique | .[]' files_added.json files_modified.json
+          jq --raw-output --slurp '[.[][]] | map(select(. | match("^Dockerfile\\.d/"))) | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) | unique | .[]' $HOME/files_{added,modified}.json
       - name: merge json files
         run: >
           jq --raw-output --slurp '[.[][]] 
@@ -44,7 +44,7 @@ jobs:
           | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
           | unique 
           | .[]' 
-          files_added.json files_modified.json
+          $HOME/files_{added,modified}.json
       - name: loop entries
         run: >
           for context in $(jq --raw-output --slurp '[.[][]] 
@@ -52,7 +52,7 @@ jobs:
           | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
           | unique 
           | .[]' 
-          files_added.json files_modified.json)
+          $HOME/files_{added,modified}.json)
           do
             echo "CONTEXT: $context"
             docker build $context
