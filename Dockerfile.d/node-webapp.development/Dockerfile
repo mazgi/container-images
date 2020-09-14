@@ -1,3 +1,4 @@
+# See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile
 FROM node:12 as base
 
 # Set in non-interactive mode.
@@ -22,6 +23,9 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # 
   # Install middleware clients
   && apt-get install --assume-yes default-mysql-client redis-tools\
+  # 
+  # Install development packages
+  && npm install --global npm-check-updates\
   # 
   # Create a user for development
   && addgroup --gid ${GID} developer || true\
