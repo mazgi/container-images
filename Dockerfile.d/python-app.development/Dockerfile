@@ -16,6 +16,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && locale-gen\
   && apt-get install --assume-yes dnsutils git jq netcat sudo tmux unzip zsh\
   && python3 -m pip install --upgrade pip\
+  && touch /etc/skel/.zshrc\
   && addgroup --gid ${GID} developer || true\
   && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\

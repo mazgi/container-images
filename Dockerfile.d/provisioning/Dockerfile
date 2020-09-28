@@ -49,6 +49,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && pip3 install ansible==${ANSIBLE_VERSION} ansible-lint\
   # 
   # Create a user for development
+  && touch /etc/skel/.zshrc\
   && addgroup --gid ${GID} developer || true\
   && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\

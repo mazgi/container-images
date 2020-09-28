@@ -28,6 +28,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && npm install --global npm-check-updates\
   # 
   # Create a user for development
+  && touch /etc/skel/.zshrc\
   && addgroup --gid ${GID} developer || true\
   && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
   # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
