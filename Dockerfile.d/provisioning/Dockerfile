@@ -10,7 +10,7 @@ ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
 ENV ANSIBLE_VERSION=2.9.12
-ENV TERRAFORM_VERSION=0.12.9
+ENV TERRAFORM_VERSION=0.13.3
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
