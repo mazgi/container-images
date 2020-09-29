@@ -22,7 +22,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   #
   # Install basic packages
   && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
-  && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 software-properties-common\
+  && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
   # 
   # Install Docker CLI
   && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -\
