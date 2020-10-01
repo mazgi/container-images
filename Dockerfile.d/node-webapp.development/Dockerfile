@@ -28,6 +28,8 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && npm install --global npm-check-updates\
   # 
   # Create a user for development
+  && touch /home/node/.zshrc\
+  && chown node:node /home/node/.zshrc\
   && touch /etc/skel/.zshrc\
   && addgroup --gid ${GID} developer || true\
   && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
