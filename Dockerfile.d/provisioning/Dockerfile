@@ -49,10 +49,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # 
   # Install tfenv
   && git clone --depth=1 https://github.com/tfutils/tfenv.git /usr/local/tfenv\
-  && echo '#!/bin/bash -eu' > /etc/profile.d/tfenv.sh\
-  && echo 'export PATH="/usr/local/tfenv/bin:$PATH"' >> /etc/profile.d/tfenv.sh\
-  && echo 'export PATH="/usr/local/tfenv/bin:$PATH"' >> /etc/zsh/zprofile\
-  && . /etc/profile.d/tfenv.sh\
+  && ls -1 /usr/local/tfenv/bin/ | xargs -IB ln -s /usr/local/tfenv/bin/B /usr/local/bin/B\
   # Install Terraform via tfenv
   && echo $TERRAFORM_VERSIONS | tr ',' '\n' | xargs -IV tfenv install V\
   # use the beginning version on the list
