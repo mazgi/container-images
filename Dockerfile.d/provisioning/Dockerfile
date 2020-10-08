@@ -11,8 +11,8 @@ ENV UID=${UID:-0}
 
 ARG ANSIBLE_VERSION=2.9.12
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
-ARG TERRAFORM_VERSION=0.13.4
-ENV TERRAFORM_VERSION=${TERRAFORM_VERSION}
+ARG TERRAFORM_VERSIONS=0.13.4,0.13.3
+ENV TERRAFORM_VERSIONS=${TERRAFORM_VERSIONS}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
@@ -42,9 +42,18 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get update\
   && apt-get install --assume-yes google-cloud-sdk\
   # 
-  # Install Terraform
-  && curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip\
-  && unzip -d /usr/local/bin/ /tmp/terraform.zip\
+  # Install tfenv
+  && git clone --depth=1 https://github.com/tfutils/tfenv.git /usr/local/tfenv\
+  && echo '#!/bin/bash -eu' > /etc/profile.d/tfenv.sh\
+  && echo 'export PATH="/usr/local/tfenv/bin:$PATH"' >> /etc/profile.d/tfenv.sh\
+  && echo 'export PATH="/usr/local/tfenv/bin:$PATH"' >> /etc/zsh/zprofile\
+  && . /etc/profile.d/tfenv.sh\
+  # Install Terraform via tfenv
+  && echo $TERRAFORM_VERSIONS | tr ',' '\n' | xargs -IV tfenv install V\
+  # use the beginning version on the list
+  && tfenv use ${TERRAFORM_VERSIONS%%,*}\
+  # && curl -L -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip\
+  # && unzip -d /usr/local/bin/ /tmp/terraform.zip\
   #
   # Install Ansible
   && apt-get install --assume-yes python3-pip python3-setuptools\
