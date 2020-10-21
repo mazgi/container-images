@@ -16,18 +16,10 @@ jobs:
       - uses: actions/checkout@v2
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
-      - name: detect contexts that changed
-        run: >
-          jq --raw-output --slurp '[.[][]] 
-          | map(select(. | match("^Dockerfile\\.d/"))) 
-          | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
-          | unique 
-          | .[]' 
-          $HOME/files_{added,modified}.json
       - run: echo SHORT_SHA=$(echo '${{ toJSON(github) }}' | jq -r '.sha[0:7]') >> $GITHUB_ENV
       - name: login to ghcr.io
         run: echo ${{ secrets.TOKEN_TO_PUSH_GHCR }} | docker login ghcr.io --username ${{ github.repository_owner }} --password-stdin
-      - name: build each docker context
+      - name: build and push each docker context that was changed
         run: |
           for context in $(jq --raw-output --slurp '[.[][]] 
           | map(select(. | match("^Dockerfile\\.d/"))) 
@@ -50,4 +42,4 @@ jobs:
           do
             docker push $target
           done < $HOME/built_images.txt
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
