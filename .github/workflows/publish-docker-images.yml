@@ -1,0 +1,46 @@
+name: publish-docker-images
+# See: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths
+on:
+  push:
+    paths:
+      - "Dockerfile.d/**"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        # See: https://github.com/actions/virtual-environments
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.4
+      - name: store the short sha hash
+        run: echo SHORT_SHA=$(echo '${{ toJSON(github) }}' | jq -r '.sha[0:7]') >> $GITHUB_ENV
+      - name: login to ghcr.io
+        run: echo ${{ secrets.TOKEN_TO_PUSH_GHCR }} | docker login ghcr.io --username ${{ github.repository_owner }} --password-stdin
+      - name: build and push each docker context that was changed
+        run: |
+          for context in $(jq --raw-output --slurp '[.[][]] 
+          | map(select(. | match("^Dockerfile\\.d/"))) 
+          | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
+          | unique 
+          | .[]' \
+          $HOME/files_{added,modified}.json)
+          do
+            echo "CONTEXT: $context" #Dockerfile.d/ruby-webapp.development
+            TAG=$(date +%Y%m-)$SHORT_SHA
+            TARGET_IMAGE=ghcr.io/${{ github.repository_owner }}/$(basename $context)
+            echo $TARGET_IMAGE >> $HOME/built_images.txt
+            docker build --tag $TARGET_IMAGE $context
+            docker tag $TARGET_IMAGE $TARGET_IMAGE:$TAG
+            docker push $TARGET_IMAGE:$TAG
+          done
+      - name: overwrite latest tags if it is the main branch
+        run: |
+          while read target
+          do
+            docker push $target
+          done < $HOME/built_images.txt
+        if: github.ref == 'refs/heads/main'
