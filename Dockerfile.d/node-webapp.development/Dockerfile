@@ -1,8 +1,6 @@
 # See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile
 FROM node:12 as base
 
-# changed 0
-
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
