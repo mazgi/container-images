@@ -1,13 +1,10 @@
 # See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/ruby-webapp.development/Dockerfile
 FROM ruby:2.5.1 as base
 
+LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/ruby-webapp.development/Dockerfile"
+
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
-
-ARG GID=0
-ARG UID=0
-ENV GID=${GID:-0}
-ENV UID=${UID:-0}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
@@ -24,13 +21,8 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # Install middleware clients
   && apt-get install --assume-yes default-mysql-client redis-tools\
   # 
-  # Create a user for development
-  && touch /etc/skel/.zshrc\
-  && addgroup --gid ${GID} developer || true\
-  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
-  # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
-  && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
-  && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
+  # Place empty .zshrc
+  && touch /etc/skel/.zshrc
 
 # Reset DEBIAN_FRONTEND to default(`dialog`).
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.

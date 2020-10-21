@@ -1,13 +1,9 @@
-# See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile
 FROM debian:10
+
+LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile"
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
-
-ARG GID=0
-ARG UID=0
-ENV GID=${GID:-0}
-ENV UID=${UID:-0}
 
 ARG ANSIBLE_VERSION=2.9.12
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
@@ -63,12 +59,8 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # Install Ansible
   && pip3 install ansible==${ANSIBLE_VERSION} ansible-lint\
   # 
-  # Create a user for development
-  && touch /etc/skel/.zshrc\
-  && addgroup --gid ${GID} developer || true\
-  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
-  && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
-  && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
+  # Place empty .zshrc
+  && touch /etc/skel/.zshrc
 
 # Reset DEBIAN_FRONTEND to default(`dialog`).
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.

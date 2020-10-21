@@ -1,6 +1,5 @@
 FROM node:12 as base
 
-# update the file for actions
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
 
 # Set in non-interactive mode.

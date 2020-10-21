@@ -1,13 +1,10 @@
 FROM python:3.6.9-buster
 
+LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/python-app.development/Dockerfile"
+
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 # ENV CLOUDSDK_CONFIG=/.config/gcloud
-
-ARG GID=0
-ARG UID=0
-ENV GID=${GID:-0}
-ENV UID=${UID:-0}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
@@ -16,11 +13,9 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && locale-gen\
   && apt-get install --assume-yes dnsutils git jq netcat sudo tmux unzip zsh\
   && python3 -m pip install --upgrade pip\
-  && touch /etc/skel/.zshrc\
-  && addgroup --gid ${GID} developer || true\
-  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
-  && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
-  && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
+  # 
+  # Place empty .zshrc
+  && touch /etc/skel/.zshrc
 
 # Reset DEBIAN_FRONTEND to default(`dialog`).
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
