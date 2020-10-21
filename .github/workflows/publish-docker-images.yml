@@ -42,14 +42,11 @@ jobs:
         run: |
           TAG=$(date +%Y%m-)$SHORT_SHA
           TARGET_IMAGE=ghcr.io/${{ github.repository_owner }}/$(basename ${{ matrix.target-context }})
-          echo $TARGET_IMAGE >> $HOME/built_images.txt
+          echo "TARGET_IMAGE=$TARGET_IMAGE" >> $GITHUB_ENV
           docker build --tag $TARGET_IMAGE ${{ matrix.target-context }}
           docker tag $TARGET_IMAGE $TARGET_IMAGE:$TAG
           docker push $TARGET_IMAGE:$TAG
       - name: overwrite latest tags if it is the main branch
         run: |
-          while read target
-          do
-            docker push $target
-          done < $HOME/built_images.txt
+          docker push $TARGET_IMAGE
         if: github.ref == 'refs/heads/main'

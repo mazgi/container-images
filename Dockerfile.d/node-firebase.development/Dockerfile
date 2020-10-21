@@ -17,7 +17,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes sudo dnsutils netcat git tmux zsh jq\
   # 
   # Todo: Why did I install OpenJDK???
-  # && apt-get install --assume-yes openjdk-8-jdk-headless\
+  && apt-get install --assume-yes openjdk-8-jdk-headless\
   # 
   # Place empty .zshrc
   && touch /etc/skel/.zshrc
