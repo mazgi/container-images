@@ -1,6 +1,8 @@
 # See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile
 FROM debian:10
 
+# changed 0
+
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
