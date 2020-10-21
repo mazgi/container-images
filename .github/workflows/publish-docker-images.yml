@@ -26,7 +26,7 @@ jobs:
           $HOME/files_{added,modified}.json
       - run: echo SHORT_SHA=$(echo '${{ toJSON(github) }}' | jq -r '.sha[0:7]') >> $GITHUB_ENV
       - name: login to ghcr.io
-        run: echo ${{ secrets.TOKEN_TO_PUSH_GHCR }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+        run: echo ${{ secrets.TOKEN_TO_PUSH_GHCR }} | docker login ghcr.io --username ${{ github.repository_owner }} --password-stdin
       - name: build each docker context
         run: |
           for context in $(jq --raw-output --slurp '[.[][]] 
@@ -48,6 +48,6 @@ jobs:
         run: |
           while read target
           do
-            echo docker push $target
+            docker push $target
           done < $HOME/built_images.txt
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
