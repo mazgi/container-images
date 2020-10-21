@@ -6,12 +6,10 @@ on:
       - "Dockerfile.d/**"
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        # See: https://github.com/actions/virtual-environments
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+  detect:
+    outputs:
+      changed-contexts: ${{ steps['detected-context-paths'].outputs['changed-contexts'] }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       # - name: Install Docker for Mac
@@ -21,21 +19,25 @@ jobs:
         uses: trilom/file-changes-action@v1.2.4
       - name: detect contexts that changed
         run: >
-          jq --raw-output --slurp '[.[][]] 
+          jq --compact-output --slurp '[.[][]] 
           | map(select(. | match("^Dockerfile\\.d/"))) 
           | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
-          | unique 
-          | .[]' 
-          $HOME/files_{added,modified}.json
-      - name: build each docker context
+          | unique' 
+          $HOME/files_{added,modified}.json > $HOME/changed_contexts.json
+      - id: detected-context-paths
+        run: echo "::set-output name=changed-contexts::$(cat $HOME/changed_contexts.json)"
+  build:
+    needs:
+      - detect
+    strategy:
+      matrix:
+        # See: https://github.com/actions/virtual-environments
+        os: [ubuntu-latest]
+        target-context: ${{ fromJson(needs.detect.outputs['changed-contexts']) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ${{ matrix.target-context }}
+      - name: build each docker context that was changed
         run: |
-          for context in $(jq --raw-output --slurp '[.[][]] 
-          | map(select(. | match("^Dockerfile\\.d/"))) 
-          | map(. |= (gsub("Dockerfile\\.d/(?<context>[^/]*)/.*"; "Dockerfile.d/\(.context)"))) 
-          | unique 
-          | .[]' \
-          $HOME/files_{added,modified}.json)
-          do
-            echo "CONTEXT: $context"
-            docker build $context
-          done
+          docker build ${{ matrix.target-context }}
