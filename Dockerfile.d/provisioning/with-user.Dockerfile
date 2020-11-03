@@ -21,3 +21,6 @@ RUN :\
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
 # see also: man 7 debconf
 ENV DEBIAN_FRONTEND=
+
+COPY rootfs /
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.start-services.zsh" ]
