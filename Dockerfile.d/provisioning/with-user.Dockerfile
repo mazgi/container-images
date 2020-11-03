@@ -5,15 +5,22 @@ LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
+ARG DOCKER_GID
 ARG GID=0
 ARG UID=0
+ENV DOCKER_GID=${DOCKER_GID}
 ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
 RUN :\
+  && apt-get install --assume-yes avahi-utils libnss-mdns\
   # Create a user for development who has the same UID and GID as you.
-  && addgroup --gid ${GID} developer || true\
-  && adduser --disabled-password --uid ${UID} --gecos '' --gid ${GID} developer || true\
+  && groupadd --gid ${GID} developer || true\
+  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
+  # Append docker group
+  && bash -c "test -v DOCKER_GID && groupadd --gid ${DOCKER_GID} docker" || true\
+  && usermod --append --groups docker developer || true\
+  # Set sudo: (ALL) NOPASSWD: ALL
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
 
