@@ -13,7 +13,6 @@ ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
 RUN :\
-  && apt-get install --assume-yes avahi-utils libnss-mdns\
   # Create a user for development who has the same UID and GID as you.
   && groupadd --gid ${GID} developer || true\
   && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
