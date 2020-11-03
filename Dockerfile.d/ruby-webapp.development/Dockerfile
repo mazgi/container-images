@@ -1,6 +1,7 @@
 # See: https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/ruby-webapp.development/Dockerfile
 FROM ruby:2.5.1 as base
 
+LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/ruby-webapp.development/Dockerfile"
 
 # Set in non-interactive mode.

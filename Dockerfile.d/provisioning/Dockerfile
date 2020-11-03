@@ -1,5 +1,6 @@
 FROM debian:10
 
+LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile"
 
 # Set in non-interactive mode.
