@@ -14,11 +14,11 @@ ENV UID=${UID:-0}
 
 RUN :\
   # Create a user for development who has the same UID and GID as you.
-  && groupadd --gid ${GID} developer || true\
+  && groupadd --force --gid ${GID} developer || true\
   && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
   # Append docker group
-  && bash -c "test -v DOCKER_GID && groupadd --gid ${DOCKER_GID} docker" || true\
-  && usermod --append --groups docker developer || true\
+  && bash -c "test -n \"${DOCKER_GID}\" && groupadd --gid ${DOCKER_GID} docker" || true\
+  && usermod --append --groups docker developer 2> /dev/null || true\
   # Set sudo: (ALL) NOPASSWD: ALL
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
