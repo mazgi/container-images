@@ -1,15 +1,16 @@
 services:
-  node-firebase:
+  node-firebase.development:
     build:
-      context: Dockerfile.d/node-firebase.development
       args:
-        UID: ${UID:-0}
         GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/node-firebase.development
+      dockerfile: with-user.Dockerfile
     command:
       - bash
       - -c
       - |
-        npm install
+        echo npm install
     environment:
       - FIREBASE_TOKEN
     ports:
@@ -24,4 +25,36 @@ services:
     volumes:
       - .:/workspace
     working_dir: /workspace
-version: "3.7"
+  node-webapp.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/node-webapp.development
+      dockerfile: with-user.Dockerfile
+    user: "${UID:-0}:${GID:-0}"
+  provisioning:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/provisioning
+      dockerfile: with-user.Dockerfile
+    user: "${UID:-0}:${GID:-0}"
+  python-app.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/python-app.development
+      dockerfile: with-user.Dockerfile
+    user: "${UID:-0}:${GID:-0}"
+  ruby-webapp.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/ruby-webapp.development
+      dockerfile: with-user.Dockerfile
+    user: "${UID:-0}:${GID:-0}"
+version: "3.8"

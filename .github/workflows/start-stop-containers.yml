@@ -1,0 +1,16 @@
+name: start-stop-containers
+
+on:
+  push:
+
+jobs:
+  provisioning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo "GID=$(id -g)" >> .env
+          echo "UID=$(id -u)" >> .env
+      - run: docker-compose build
+      - run: docker-compose up
+      - run: docker-compose down -v
