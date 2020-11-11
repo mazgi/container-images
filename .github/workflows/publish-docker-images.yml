@@ -34,6 +34,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      - name: enable buildkit
+        run: |
+          echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
       - name: store the short sha hash
         run: echo SHORT_SHA=$(echo '${{ toJSON(github) }}' | jq -r '.sha[0:7]') >> $GITHUB_ENV
       - name: login to ghcr.io
