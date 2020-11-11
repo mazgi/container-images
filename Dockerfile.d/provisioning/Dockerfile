@@ -39,6 +39,11 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && unzip /tmp/awscliv2.zip -d /tmp/\
   && /tmp/aws/install\
   && rm -rf /tmp/awscliv2.zip /tmp/aws/\
+  && apt-get install --assume-yes groff less\
+  && curl --location https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb\
+  --output /tmp/session-manager-plugin.deb\
+  --silent\
+  && dpkg -i /tmp/session-manager-plugin.deb\
   # 
   # Install Google Cloud SDK
   && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -\
