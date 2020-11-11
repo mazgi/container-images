@@ -24,6 +24,13 @@ RUN : emerge packages\
   =net-libs/nodejs-${NODE_VERSION}*\
   && :
 
+# ================================
+FROM scratch as reducer
+
+ENV GENTOO_ARCH=${GENTOO_ARCH:-amd64}
+
+# Copy extracted files
+COPY --from=builder / /
 RUN cp -Rp /var/db/repos/gentoo/profiles /tmp/
 # Clean up
 RUN rm -rf\
@@ -38,4 +45,4 @@ RUN mkdir -p /var/db/repos/gentoo/\
 FROM scratch
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
-COPY --from=builder / /
+COPY --from=reducer / /
