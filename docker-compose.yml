@@ -1,4 +1,12 @@
 services:
+  debian-node-webapp.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/debian-node-webapp.development
+      dockerfile: with-user.Dockerfile
+    user: "${UID:-0}:${GID:-0}"
   node-firebase.development:
     build:
       args:
