@@ -65,5 +65,7 @@ jobs:
           docker push $TARGET_IMAGE:$TAG
       - name: overwrite latest tags if it is the main branch
         run: |
-          docker push $TARGET_IMAGE:${{ matrix.node-version }}
+          TAG=${{ matrix.node-version }}
+          docker tag $TARGET_IMAGE $TARGET_IMAGE:$TAG
+          docker push $TARGET_IMAGE:$TAG
         if: github.ref == 'refs/heads/main'

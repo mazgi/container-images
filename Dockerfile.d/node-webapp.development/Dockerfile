@@ -23,6 +23,12 @@ RUN : emerge packages\
   dev-db/redis\
   =net-libs/nodejs-${NODE_VERSION}*\
   && :
+# Install development packages
+RUN : install global npm packages\
+  && npm install --global\
+  npm-check-updates\
+  sort-package-json\
+  && :
 
 # ================================
 FROM scratch as reducer
