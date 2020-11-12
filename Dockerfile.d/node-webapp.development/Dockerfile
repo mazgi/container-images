@@ -1,35 +1,48 @@
-FROM node:12 as base
+ARG GENTOO_ARCH='amd64'
+ARG NODE_VERSION=14
 
+FROM ghcr.io/mazgi/gentoo as builder
+
+ENV GENTOO_ARCH=${GENTOO_ARCH:-amd64}
+ENV NODE_VERSION=${NODE_VERSION:-14}
+
+COPY rootfs/${GENTOO_ARCH} .
+
+# Clone portage repository from GitHub
+RUN :\
+  && mkdir -p /var/db/repos/\
+  && rm -rf /var/db/repos/gentoo\
+  && git clone --depth=1 git://github.com/gentoo-mirror/gentoo.git /var/db/repos/gentoo\
+  && rm -rf /var/db/repos/gentoo/.git
+
+# Build packages
+RUN : emerge packages\
+  && emerge -uNDvq --buildpkg --usepkg\
+  app-misc/jq\
+  dev-db/mysql\
+  dev-db/redis\
+  =net-libs/nodejs-${NODE_VERSION}*\
+  && :
+
+# ================================
+FROM scratch as reducer
+
+ENV GENTOO_ARCH=${GENTOO_ARCH:-amd64}
+
+# Copy extracted files
+COPY --from=builder / /
+RUN cp -Rp /var/db/repos/gentoo/profiles /tmp/
+# Clean up
+RUN rm -rf\
+  /var/cache/binpkgs/*\
+  /var/db/repos/*\
+  /var/lib/portage\
+  /var/log/*
+RUN mkdir -p /var/db/repos/gentoo/\
+  && mv /tmp/profiles /var/db/repos/gentoo/
+
+# ================================
+FROM scratch
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
-
-# Set in non-interactive mode.
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
-  && apt-get update\
-  # 
-  # Set up locales
-  && apt-get install --assume-yes locales procps dialog\
-  && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen\
-  && locale-gen\
-  #
-  # Install basic packages
-  && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
-  && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 software-properties-common\
-  # 
-  # Install middleware clients
-  && apt-get install --assume-yes default-mysql-client redis-tools\
-  # 
-  # Install development packages
-  && npm install --global npm-check-updates sort-package-json\
-  # 
-  # Place empty .zshrc
-  && touch /home/node/.zshrc\
-  && chown node:node /home/node/.zshrc\
-  && touch /etc/skel/.zshrc
-
-# Reset DEBIAN_FRONTEND to default(`dialog`).
-# If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
-# see also: man 7 debconf
-ENV DEBIAN_FRONTEND=
+COPY --from=reducer / /

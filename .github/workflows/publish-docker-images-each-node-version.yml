@@ -1,9 +1,9 @@
-name: publish-docker-images
+name: publish-docker-images-each-node-version
 # See: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths
 on:
   push:
     paths:
-      - "Dockerfile.d/**"
+      - "Dockerfile.d/node-webapp.development/**"
 
 jobs:
   detect:
@@ -31,6 +31,7 @@ jobs:
         # See: https://github.com/actions/virtual-environments
         os: [ubuntu-latest]
         target-context: ${{ fromJson(needs.detect.outputs['changed-contexts']) }}
+        node-version: [12]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -56,13 +57,13 @@ jobs:
         run: echo ${{ secrets.TOKEN_TO_PUSH_GHCR }} | docker login ghcr.io --username ${{ github.repository_owner }} --password-stdin
       - name: build and push ${{ matrix.target-context }}
         run: |
-          TAG=$(date +%Y%m-)$SHORT_SHA
+          TAG=${{ matrix.node-version }}-$(date +%Y%m-)$SHORT_SHA
           TARGET_IMAGE=ghcr.io/${{ github.repository_owner }}/$(basename ${{ matrix.target-context }})
           echo "TARGET_IMAGE=$TARGET_IMAGE" >> $GITHUB_ENV
-          docker build --tag $TARGET_IMAGE ${{ matrix.target-context }}
+          docker build --build-arg=NODE_VERSION=${{ matrix.node-version }} --tag $TARGET_IMAGE ${{ matrix.target-context }}
           docker tag $TARGET_IMAGE $TARGET_IMAGE:$TAG
           docker push $TARGET_IMAGE:$TAG
       - name: overwrite latest tags if it is the main branch
         run: |
-          docker push $TARGET_IMAGE
+          docker push $TARGET_IMAGE:${{ matrix.node-version }}
         if: github.ref == 'refs/heads/main'
