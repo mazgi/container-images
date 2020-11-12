@@ -14,12 +14,13 @@ ENV UID=${UID:-0}
 
 RUN :\
   # Create a user for development who has the same UID and GID as you.
-  && groupadd --force --gid ${GID} developer || true\
-  && useradd --comment '' --create-home --gid users --groups developer --uid ${UID} developer\
+  && useradd --comment '' --create-home --gid users --uid ${UID} developer\
+  && groupadd --gid ${GID} developer\
+  && usermod --append --groups developer developer || true\
   # Append docker group
-  && bash -c "test -n \"${DOCKER_GID}\" && groupadd --gid ${DOCKER_GID} docker" || true\
+  && bash -c "test -n \"${DOCKER_GID}\" && groupadd --gid ${DOCKER_GID} docker"\
   && usermod --append --groups docker developer 2> /dev/null || true\
-  # Set sudo: (ALL) NOPASSWD: ALL
+  # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
 

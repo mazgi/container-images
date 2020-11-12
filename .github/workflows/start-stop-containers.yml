@@ -9,6 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
           echo "GID=$(id -g)" >> .env
           echo "UID=$(id -u)" >> .env
       - run: docker-compose build

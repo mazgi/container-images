@@ -44,6 +44,7 @@ services:
   provisioning:
     build:
       args:
+        DOCKER_GID: ${DOCKER_GID}
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/provisioning
