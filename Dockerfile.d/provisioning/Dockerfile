@@ -6,9 +6,9 @@ LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG ANSIBLE_VERSION=2.9.12
+ARG ANSIBLE_VERSION=2.10
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
-ARG TERRAFORM_VERSIONS=0.13.4,0.13.3
+ARG TERRAFORM_VERSIONS=0.13.5,0.13.4
 ENV TERRAFORM_VERSIONS=${TERRAFORM_VERSIONS}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
