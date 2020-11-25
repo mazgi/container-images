@@ -25,6 +25,13 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes avahi-utils libnss-mdns\
   && apt-get install --assume-yes python3-pip python3-setuptools\
   # 
+  # Install 1Password CLI
+  # https://cache.agilebits.com/dist/1P/op/pkg/v1.8.0/op_linux_amd64_v1.8.0.zip
+  && curl -fsSLO https://cache.agilebits.com/dist/1P/op/pkg/v1.8.0/op_linux_amd64_v1.8.0.zip\
+  && unzip op_linux_amd64_v1.8.0.zip\
+  && mv op /usr/local/bin/\
+  && rm -rf op_linux_amd64_v1.8.0.zip op.sig\
+  # 
   # Install Docker CLI
   && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -\
   && add-apt-repository \
