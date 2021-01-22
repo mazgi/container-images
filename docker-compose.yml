@@ -6,7 +6,35 @@ services:
         UID: ${UID:-0}
       context: Dockerfile.d/debian-node-webapp.development
       dockerfile: with-user.Dockerfile
+    command:
+      - zsh
+      - -lc
+      - |
+        npm-check-updates --upgrade
+        npm install
+        npm audit fix
+        sort-package-json
+        npm run test
     user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/node-webapp:/project/workspace
+    working_dir: /project/workspace
+  dotnet-app.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/dotnet-app.development
+      dockerfile: with-user.Dockerfile
+    command:
+      - zsh
+      - -lc
+      - |
+        dotnet test --logger:"console;verbosity=detailed" test/
+    user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/dotnet-app:/project/workspace
+    working_dir: /project/workspace
   node-firebase.development:
     build:
       args:
@@ -15,8 +43,8 @@ services:
       context: Dockerfile.d/node-firebase.development
       dockerfile: with-user.Dockerfile
     command:
-      - bash
-      - -c
+      - zsh
+      - -lc
       - |
         echo npm install
     environment:
@@ -40,7 +68,19 @@ services:
         UID: ${UID:-0}
       context: Dockerfile.d/node-webapp.development
       dockerfile: with-user.Dockerfile
+    command:
+      - zsh
+      - -lc
+      - |
+        npm-check-updates --upgrade
+        npm install
+        npm audit fix
+        sort-package-json
+        npm run test
     user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/node-webapp:/project/workspace
+    working_dir: /project/workspace
   provisioning:
     build:
       args:
@@ -57,7 +97,16 @@ services:
         UID: ${UID:-0}
       context: Dockerfile.d/python-app.development
       dockerfile: with-user.Dockerfile
+    command:
+      - zsh
+      - -lc
+      - |
+        pip install -e .\[test\]
+        python -m pytest --cov --pycodestyle module
     user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/python-app:/project/workspace
+    working_dir: /project/workspace
   ruby-webapp.development:
     build:
       args:
