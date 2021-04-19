@@ -23,9 +23,11 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   #
   # Install basic packages
   && apt-get install --assume-yes apt-utils curl dnsutils git jq openssh-client sudo tmux unzip zsh\
+  && apt-get install --assume-yes build-essential\
   && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
   && apt-get install --assume-yes avahi-utils libnss-mdns\
   && apt-get install --assume-yes python3-pip python3-setuptools\
+  && apt-get install --assume-yes python3-dev libssl-dev\
   # 
   # Install 1Password CLI
   && curl -fsSLO https://cache.agilebits.com/dist/1P/op/pkg/v${OP_VERSION}/op_linux_amd64_v${OP_VERSION}.zip\
@@ -60,6 +62,9 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get update\
   && apt-get install --assume-yes google-cloud-sdk\
   # for gsutil signurl
+  # https://cryptography.io/en/latest/installation/#rust
+  && curl https://sh.rustup.rs -sSf | sh -s -- -y\
+  && . $HOME/.cargo/env\
   && pip3 install pyopenssl\
   # 
   # Install tfenv
