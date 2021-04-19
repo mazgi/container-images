@@ -8,6 +8,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG ANSIBLE_VERSION=2.10
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
+ARG OP_VERSION=1.9.0
+ENV OP_VERSION=1.9.0
 ARG TERRAFORM_VERSIONS=0.15.0,0.14.10
 ENV TERRAFORM_VERSIONS=${TERRAFORM_VERSIONS}
 
@@ -26,11 +28,10 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && apt-get install --assume-yes python3-pip python3-setuptools\
   # 
   # Install 1Password CLI
-  # https://cache.agilebits.com/dist/1P/op/pkg/v1.8.0/op_linux_amd64_v1.8.0.zip
-  && curl -fsSLO https://cache.agilebits.com/dist/1P/op/pkg/v1.8.0/op_linux_amd64_v1.8.0.zip\
-  && unzip op_linux_amd64_v1.8.0.zip\
+  && curl -fsSLO https://cache.agilebits.com/dist/1P/op/pkg/v${OP_VERSION}/op_linux_amd64_v${OP_VERSION}.zip\
+  && unzip op_linux_amd64_v${OP_VERSION}.zip\
   && mv op /usr/local/bin/\
-  && rm -rf op_linux_amd64_v1.8.0.zip op.sig\
+  && rm -rf op_linux_amd64_v${OP_VERSION}.zip op.sig\
   # 
   # Install Docker CLI
   && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -\
