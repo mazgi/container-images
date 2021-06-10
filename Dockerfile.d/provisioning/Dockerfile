@@ -10,7 +10,8 @@ ARG ANSIBLE_VERSION=2.10
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
 ARG OP_VERSION=1.9.0
 ENV OP_VERSION=1.9.0
-ARG TERRAFORM_VERSIONS=0.15.1,0.14.11
+# https://www.terraform.io/downloads.html
+ARG TERRAFORM_VERSIONS=0.15.5,0.14.11
 ENV TERRAFORM_VERSIONS=${TERRAFORM_VERSIONS}
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
