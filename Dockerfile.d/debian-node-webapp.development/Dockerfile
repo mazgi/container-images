@@ -1,4 +1,4 @@
-FROM node:12 as base
+FROM node:16 as base
 
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/debian-node-webapp.development.development/Dockerfile"
