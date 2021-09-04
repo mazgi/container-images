@@ -5,8 +5,8 @@ LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob
 
 ARG GENTOO_ARCH='amd64'
 ENV GENTOO_ARCH=${GENTOO_ARCH:-amd64}
-ARG NODE_VERSION=14
-ENV NODE_VERSION=${NODE_VERSION:-14}
+ARG NODE_VERSION=16
+ENV NODE_VERSION=${NODE_VERSION:-16}
 
 COPY rootfs/${GENTOO_ARCH} .
 
