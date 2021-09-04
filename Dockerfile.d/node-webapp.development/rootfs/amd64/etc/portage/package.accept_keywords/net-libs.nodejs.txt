@@ -1,0 +1,2 @@
+# for node 16
+net-libs/nodejs ~amd64
