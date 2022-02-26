@@ -1,4 +1,4 @@
-FROM debian:10
+FROM debian:11
 
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/provisioning/Dockerfile"
