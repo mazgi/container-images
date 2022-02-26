@@ -49,6 +49,9 @@ RUN : APT Repository [Azure]\
   && echo\
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft-keyring.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main"\
   | tee /etc/apt/sources.list.d/azure-cli.list > /dev/null\
+  && echo\
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft-keyring.gpg] https://packages.microsoft.com/repos/microsoft-debian-$(lsb_release -cs)-prod/ $(lsb_release -cs) main"\
+  | tee /etc/apt/sources.list.d/microsoft-debian-prod.list > /dev/null\
   && :
 RUN : APT Repository [Google Cloud]\
   # See https://cloud.google.com/sdk/docs/install#deb
@@ -60,7 +63,8 @@ RUN : APT Repository [Google Cloud]\
 RUN : Install Packages from Added Repositories\
   && apt-get update\
   # Azure
-  && apt-get install --assume-yes azure-cli\
+  && apt-get install --assume-yes azure-cli powershell\
+  && pwsh -c 'Install-Module -AllowClobber -Force -Name Az'\
   # Docker
   && apt-get install --assume-yes docker-ce docker-ce-cli containerd.io\
   # Google Cloud
