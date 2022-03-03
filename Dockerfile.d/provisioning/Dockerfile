@@ -60,6 +60,13 @@ RUN : APT Repository [Google Cloud]\
   && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"\
   | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list\
   && :
+RUN : APT Repository [Helm]\
+  # See https://helm.sh/docs/intro/install/#from-apt-debianubuntu
+  && curl --fail --silent --show-error --location https://baltocdn.com/helm/signing.asc\
+  | gpg --no-default-keyring --keyring /usr/share/keyrings/helm.gpg --import -\
+  && echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main"\
+  | tee -a /etc/apt/sources.list.d/helm-stable-debian.list\
+  && :
 RUN : Install Packages from Added Repositories\
   && apt-get update\
   # Azure
@@ -69,6 +76,8 @@ RUN : Install Packages from Added Repositories\
   && apt-get install --assume-yes docker-ce docker-ce-cli containerd.io\
   # Google Cloud
   && apt-get install --assume-yes google-cloud-sdk\
+  # Helm
+  && apt-get install --assume-yes helm\
   # for `gsutil signurl`
   && pip3 install pyopenssl\
   && :
