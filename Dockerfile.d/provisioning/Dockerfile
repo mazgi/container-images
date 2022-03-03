@@ -37,7 +37,7 @@ RUN : Prepare\
 RUN : APT Repository [Docker]\
   # See https://docs.docker.com/engine/install/debian/
   && curl --fail --silent --show-error --location https://download.docker.com/linux/debian/gpg\
-  | apt-key --keyring /usr/share/keyrings/docker-archive-keyring.gpg add -\
+  | gpg --no-default-keyring --keyring /usr/share/keyrings/docker-archive-keyring.gpg --import -\
   && echo\
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable"\
   | tee /etc/apt/sources.list.d/docker.list > /dev/null\
@@ -45,7 +45,7 @@ RUN : APT Repository [Docker]\
 RUN : APT Repository [Azure]\
   # See https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt
   && curl --fail --silent --show-error --location https://packages.microsoft.com/keys/microsoft.asc\
-  | apt-key --keyring /usr/share/keyrings/microsoft-keyring.gpg add -\
+  | gpg --no-default-keyring --keyring /usr/share/keyrings/microsoft-keyring.gpg --import -\
   && echo\
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft-keyring.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main"\
   | tee /etc/apt/sources.list.d/azure-cli.list > /dev/null\
@@ -56,7 +56,7 @@ RUN : APT Repository [Azure]\
 RUN : APT Repository [Google Cloud]\
   # See https://cloud.google.com/sdk/docs/install#deb
   && curl --fail --silent --show-error --location https://packages.cloud.google.com/apt/doc/apt-key.gpg\
-  | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -\
+  | gpg --no-default-keyring --keyring /usr/share/keyrings/cloud.google.gpg --import -\
   && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"\
   | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list\
   && :
