@@ -107,8 +107,10 @@ RUN : Ansible\
   && pip3 install ansible==${ANSIBLE_VERSION} ansible-lint\
   && :
 RUN :\
-  # Place empty .zshrc
-  && touch /etc/skel/.zshrc\
+  # Install starship
+  && curl "https://starship.rs/install.sh" -o "/tmp/install.sh"\
+  && sh /tmp/install.sh --yes\
+  && rm -rf /tmp/install.sh\
   && :
 RUN :\
   # Install 1Password CLI
@@ -117,6 +119,8 @@ RUN :\
   && mv op /usr/local/bin/\
   && rm -rf op_linux_amd64_v${OP_VERSION}.zip op.sig\
   && :
+
+COPY rootfs /
 
 # Reset DEBIAN_FRONTEND to default(`dialog`).
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.

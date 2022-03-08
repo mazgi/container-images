@@ -1,0 +1,5 @@
+autoload -Uz compinit; compinit
+eval "$(starship init zsh)"
+if (( $+commands[helm] )); then
+  source <(helm completion zsh)
+fi
