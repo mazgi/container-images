@@ -1,5 +1,17 @@
+autoload -U bashcompinit; bashcompinit
 autoload -Uz compinit; compinit
-eval "$(starship init zsh)"
-if (( $+commands[helm] )); then
-  source <(helm completion zsh)
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-linux
+if (( $+commands[aws_completer] )); then
+  complete -C aws_completer aws
 fi
+if [[ -f /etc/bash_completion.d/azure-cli ]]; then
+  source /etc/bash_completion.d/azure-cli
+fi
+if [[ -f /usr/share/google-cloud-sdk/completion.zsh.inc ]]; then
+  source /usr/share/google-cloud-sdk/completion.zsh.inc
+fi
+# https://www.terraform.io/cli/commands#shell-tab-completion
+# if (( $+commands[terraform] )); then
+#   terraform -install-autocomplete
+# fi
+eval "$(starship init zsh)"

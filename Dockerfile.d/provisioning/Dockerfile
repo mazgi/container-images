@@ -25,7 +25,7 @@ RUN : Prepare\
   # 
   # Install basic packages
   && apt-get install --assume-yes\
-  apt-utils curl dnsutils git jq openssh-client sudo tmux unzip zsh\
+  apt-utils curl dnsutils git jq openssh-client sudo tmux unzip vim zsh\
   build-essential\
   cargo\
   apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
