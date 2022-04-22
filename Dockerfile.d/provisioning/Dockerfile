@@ -28,6 +28,7 @@ RUN : Prepare\
   apt-utils curl dnsutils git jq openssh-client sudo tmux unzip vim zsh\
   build-essential\
   cargo\
+  iputils-ping netcat\
   apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
   avahi-utils libnss-mdns\
   libffi-dev\
