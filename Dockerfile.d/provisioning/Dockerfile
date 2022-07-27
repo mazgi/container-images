@@ -106,6 +106,7 @@ RUN : Ansible\
   # Install Ansible
   && pip3 install wheel\
   && pip3 install ansible==${ANSIBLE_VERSION} ansible-lint\
+  && pip3 install jmespath\
   && :
 RUN :\
   # Install starship
