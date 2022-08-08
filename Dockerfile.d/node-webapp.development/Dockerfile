@@ -1,40 +1,79 @@
-FROM ghcr.io/mazgi/gentoo
+FROM ubuntu:22.04 as builder
 
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
 
-ARG GENTOO_ARCH='amd64'
-ENV GENTOO_ARCH=${GENTOO_ARCH:-amd64}
-ARG NODE_VERSION=16
-ENV NODE_VERSION=${NODE_VERSION:-16}
+ARG NODE_VERSION=18
+ENV NODE_VERSION=${NODE_VERSION:-18}
 
-COPY rootfs/${GENTOO_ARCH} .
+# Set in non-interactive mode.
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Clone portage repository from GitHub
 RUN :\
-  && mkdir -p /var/db/repos/\
-  && rm -rf /var/db/repos/gentoo\
-  && git clone --depth=1 https://github.com/gentoo-mirror/gentoo.git /var/db/repos/gentoo\
-  && rm -rf /var/db/repos/gentoo/.git\
-  # 
-  # Build packages
-  && emerge -uNDvq --buildpkg --usepkg\
-  app-misc/jq\
-  dev-db/mysql\
-  dev-db/redis\
-  =net-libs/nodejs-${NODE_VERSION}*\
-  # 
-  # Install development packages
+  && echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
+  && apt-get update\
+  && :
+
+RUN : Set up locales\
+  && apt-get install --assume-yes locales procps dialog\
+  && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen\
+  && locale-gen\
+  && :
+
+RUN : Install basic packages\
+  && apt-get install --assume-yes\
+  apt-transport-https\
+  apt-utils\
+  ca-certificates\
+  curl\
+  dnsutils\
+  git\
+  gnupg\
+  gnupg2\
+  jq\
+  openssh-client\
+  software-properties-common\
+  sudo\
+  unzip\
+  zsh\
+  && :
+
+RUN : Install middleware clients\
+  && apt-get install --assume-yes default-mysql-client redis-tools\
+  && :
+
+RUN : Install Node.js ${NODE_VERSION}\
+  && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -\
+  && apt-get install -y nodejs\
+  && :
+
+RUN : Install development NPM packages\
   && npm install --global\
   npm-check-updates\
   sort-package-json\
-  # 
-  # Clean up
-  && cp -Rp /var/db/repos/gentoo/profiles /tmp/\
-  && rm -rf\
-  /var/cache/binpkgs/*\
-  /var/db/repos/*\
-  /var/lib/portage\
-  /var/log/*\
-  && mkdir -p /var/db/repos/gentoo/\
-  && mv /tmp/profiles /var/db/repos/gentoo/
+  && :
+
+RUN : Install starship\
+  && curl "https://starship.rs/install.sh" -o "/tmp/install.sh"\
+  && sh /tmp/install.sh --yes\
+  && rm -rf /tmp/install.sh\
+  && :
+
+COPY rootfs /
+
+# It reduced the image size by more than 30MB in my environment.
+RUN : Clean up\
+  && apt-get clean autoclean\
+  && apt-get autoremove --yes\
+  && rm -rf /var/lib/{apt,dpkg,cache,log}/\
+  && :
+
+# Reset DEBIAN_FRONTEND to default(`dialog`).
+# If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
+# see also: man 7 debconf
+ENV DEBIAN_FRONTEND=
+
+# Compress layers
+FROM scratch
+CMD ["/bin/zsh"]
+COPY --from=builder / /
