@@ -49,6 +49,8 @@ RUN : Install Node.js ${NODE_VERSION}\
 
 RUN : Install development NPM packages\
   && npm install --global\
+  # see https://github.com/npm/cli/issues/3438
+  npm\
   npm-check-updates\
   sort-package-json\
   && :
