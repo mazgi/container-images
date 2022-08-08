@@ -14,7 +14,7 @@ COPY rootfs/${GENTOO_ARCH} .
 RUN :\
   && mkdir -p /var/db/repos/\
   && rm -rf /var/db/repos/gentoo\
-  && git clone --depth=1 git://github.com/gentoo-mirror/gentoo.git /var/db/repos/gentoo\
+  && git clone --depth=1 https://github.com/gentoo-mirror/gentoo.git /var/db/repos/gentoo\
   && rm -rf /var/db/repos/gentoo/.git\
   # 
   # Build packages
