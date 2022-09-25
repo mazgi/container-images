@@ -59,7 +59,17 @@ jobs:
         timeout-minutes: 4
         run: |
           docker compose up --detach ${{ matrix.service }}
-          sleep 10
+          while :
+          do
+            docker compose ps --format=json ${{ matrix.service }}\
+             | jq -e '.[] | select(.Health=="healthy")' 2> /dev/null\
+             && break
+            sleep 1
+          done
+      - name: Show logs
+        timeout-minutes: 1
+        run: |
+          docker compose logs ${{ matrix.service }}
       - name: Stop the service
         timeout-minutes: 1
         run: |
