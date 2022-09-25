@@ -54,7 +54,7 @@ jobs:
       - name: Build the service - ${{ matrix.service }}
         timeout-minutes: 4
         run: |
-          docker compose build ${{ matrix.service }}
+          docker compose build --no-cache --pull ${{ matrix.service }}
       - name: Start the service - ${{ matrix.service }}
         timeout-minutes: 4
         run: |
