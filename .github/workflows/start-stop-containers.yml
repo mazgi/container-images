@@ -59,6 +59,9 @@ jobs:
         timeout-minutes: 4
         run: |
           docker compose up --detach ${{ matrix.service }}
+      - name: Wait the service - ${{ matrix.service }}
+        timeout-minutes: 4
+        run: |
           while :
           do
             docker compose ps --format=json ${{ matrix.service }}\

@@ -15,6 +15,8 @@ services:
         npm audit fix
         sort-package-json
         npm run test
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - ./code-stubs/node-webapp:/project/workspace
@@ -31,6 +33,8 @@ services:
       - -lc
       - |
         dotnet test --logger:"console;verbosity=detailed" test/
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - ./code-stubs/dotnet-app:/project/workspace
@@ -57,6 +61,8 @@ services:
       - "${BIND_IP_ADDR:-127.0.0.1}:8080:8080"
       - "${BIND_IP_ADDR:-127.0.0.1}:8085:8085"
       - "${BIND_IP_ADDR:-127.0.0.1}:9000:9000"
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - .:/workspace
@@ -77,6 +83,8 @@ services:
         npm audit fix
         sort-package-json
         npm run test
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - ./code-stubs/node-webapp:/project/workspace
@@ -114,6 +122,8 @@ services:
       - |
         pip install -e .\[test\]
         python -m pytest --cov --pycodestyle module
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
     volumes:
       - ./code-stubs/python-app:/project/workspace
@@ -125,5 +135,7 @@ services:
         UID: ${UID:-0}
       context: Dockerfile.d/ruby-webapp.development
       dockerfile: with-user.Dockerfile
+    profiles:
+      - disabled
     user: "${UID:-0}:${GID:-0}"
 version: "3.8"

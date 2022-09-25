@@ -25,7 +25,8 @@ getStatusFilePath () {
 }
 resetStatus () {
   readonly local _dir=$(dirname ${STATUS_FILE:?})
-  mkdir -p ${_dir:?}/
+  sudo mkdir -p ${_dir:?}/
+  sudo chmod 777 ${_dir:?}/
   echo '{}' > ${STATUS_FILE:?}
 }
 updateStatusToSucceeded () {
