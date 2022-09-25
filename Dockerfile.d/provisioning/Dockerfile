@@ -74,7 +74,7 @@ RUN : Install Packages from Added Repositories\
   && apt-get install --assume-yes azure-cli powershell\
   && pwsh -c 'Install-Module -AllowClobber -Force -Name Az'\
   # Docker
-  && apt-get install --assume-yes docker-ce docker-ce-cli containerd.io\
+  && apt-get install --assume-yes docker-ce docker-ce-cli containerd.io docker-compose-plugin\
   # Google Cloud
   && apt-get install --assume-yes google-cloud-sdk\
   # Helm
