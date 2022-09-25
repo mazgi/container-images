@@ -59,10 +59,13 @@ jobs:
         timeout-minutes: 4
         run: |
           docker compose up --detach ${{ matrix.service }}
+      - name: Wait the service - ${{ matrix.service }}
+        timeout-minutes: 4
+        run: |
           while :
           do
             docker compose ps --format=json ${{ matrix.service }}\
-             | jq -e '.[] | select(.Health=="healthy")'\
+             | jq -e '.[] | select(.Health=="healthy")' 2> /dev/null\
              && break
             sleep 1
           done
