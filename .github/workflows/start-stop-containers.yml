@@ -2,28 +2,65 @@ name: start-stop-containers
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
-  provisioning:
-    timeout-minutes: 10
+  list-services:
+    timeout-minutes: 2
     runs-on: ubuntu-latest
+    outputs:
+      service-list-json: ${{ steps.get-service-list.outputs.service-list-json }}
     steps:
+      - name: Install pkgs
+        timeout-minutes: 1
+        run: |
+          sudo apt-get install --assume-yes --no-install-recommends zsh
       - uses: actions/checkout@v3
       - name: Export UIDs as environment variables
         run: |
           echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
           echo "GID=$(id -g)" >> .env
           echo "UID=$(id -u)" >> .env
-      - name: Build containers
+      - name: Export service names as the output
+        id: get-service-list
+        shell: zsh {0}
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrixinclude
+        # https://zsh.sourceforge.io/Guide/zshguide05.html#l124
+        run: |
+          _SERVICES=($(docker compose config --services))
+          echo "::set-output name=service-list-json::[\"${(j.",".)_SERVICES}\"]"
+      # - run: |
+      #     echo '${{ steps.get-service-list.outputs.service-list-json }}' | jq .
+
+  start-stop-services:
+    needs:
+      - list-services
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJson(needs.list-services.outputs.service-list-json) }}
+    steps:
+      - run: |
+          echo ${{ matrix.service }}
+      - uses: actions/checkout@v3
+      - name: Export UIDs as environment variables
+        run: |
+          echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
+          echo "GID=$(id -g)" >> .env
+          echo "UID=$(id -u)" >> .env
+      - name: Build the service - ${{ matrix.service }}
         timeout-minutes: 4
         run: |
-          docker compose build
-      - name: Start services
+          docker compose build ${{ matrix.service }}
+      - name: Start the service - ${{ matrix.service }}
         timeout-minutes: 4
         run: |
-          docker compose up --detach
+          docker compose up --detach ${{ matrix.service }}
           sleep 10
-      - name: Stop services
+      - name: Stop the service
         timeout-minutes: 1
         run: |
           docker compose down --remove-orphans --volumes
