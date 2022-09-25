@@ -2,11 +2,29 @@ name: start-stop-containers
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
-  provisioning:
+  list-services:
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    outputs:
+      service-list.json: ${{ steps.get-service-list. }}
+    steps:
+      - id: get-service-list
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+        run: |
+          echo '::set-output name=service-list.json::"[\"provisioning\"]"'
+
+  start-stop-services:
+    needs:
+      - list-services
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          include: ${{ fromJson(needs.list-services.outputs.service-list.json) }}
     steps:
       - uses: actions/checkout@v3
       - name: Export UIDs as environment variables
