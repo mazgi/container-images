@@ -9,12 +9,28 @@ jobs:
     timeout-minutes: 1
     runs-on: ubuntu-latest
     outputs:
-      service-list.json: ${{ steps.get-service-list. }}
+      service-list-json: ${{ steps.get-service-list.outputs.service-list-json }}
     steps:
-      - id: get-service-list
-        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+      - name: Install pkgs
         run: |
-          echo '::set-output name=service-list.json::"[\"provisioning\"]"'
+          sudo apt-get install --assume-yes --no-install-recommends zsh
+      - uses: actions/checkout@v3
+      - name: Export UIDs as environment variables
+        run: |
+          echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
+          echo "GID=$(id -g)" >> .env
+          echo "UID=$(id -u)" >> .env
+      - name: Export service names as the output
+        id: get-service-list
+        shell: zsh {0}
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
+        # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymatrixinclude
+        # https://zsh.sourceforge.io/Guide/zshguide05.html#l124
+        run: |
+          _SERVICES=($(docker compose config --services))
+          echo "::set-output name=service-list-json::[\"${(j.",".)_SERVICES}\"]"
+      # - run: |
+      #     echo '${{ steps.get-service-list.outputs.service-list-json }}' | jq .
 
   start-stop-services:
     needs:
@@ -22,26 +38,28 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        service:
-          include: ${{ fromJson(needs.list-services.outputs.service-list.json) }}
+        service: ${{ fromJson(needs.list-services.outputs.service-list-json) }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Export UIDs as environment variables
-        run: |
-          echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
-          echo "GID=$(id -g)" >> .env
-          echo "UID=$(id -u)" >> .env
-      - name: Build containers
-        timeout-minutes: 4
-        run: |
-          docker compose build
-      - name: Start services
-        timeout-minutes: 4
-        run: |
-          docker compose up --detach
-          sleep 10
-      - name: Stop services
-        timeout-minutes: 1
-        run: |
-          docker compose down --remove-orphans --volumes
+      - run: |
+          echo ${{ matrix.service }}
+      # - uses: actions/checkout@v3
+      # - name: Export UIDs as environment variables
+      #   run: |
+      #     echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
+      #     echo "GID=$(id -g)" >> .env
+      #     echo "UID=$(id -u)" >> .env
+      # - name: Build containers
+      #   timeout-minutes: 4
+      #   run: |
+      #     docker compose build
+      # - name: Start services
+      #   timeout-minutes: 4
+      #   run: |
+      #     docker compose up --detach
+      #     sleep 10
+      # - name: Stop services
+      #   timeout-minutes: 1
+      #   run: |
+      #     docker compose down --remove-orphans --volumes
