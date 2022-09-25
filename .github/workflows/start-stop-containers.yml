@@ -5,13 +5,25 @@ on:
 
 jobs:
   provisioning:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: |
+      - uses: actions/checkout@v3
+      - name: Export UIDs as environment variables
+        run: |
           echo "DOCKER_GID=$(getent group docker | cut -d : -f 3)" >> .env
           echo "GID=$(id -g)" >> .env
           echo "UID=$(id -u)" >> .env
-      - run: docker-compose build
-      - run: docker-compose up
-      - run: docker-compose down -v
+      - name: Build containers
+        timeout-minutes: 4
+        run: |
+          docker compose build
+      - name: Start services
+        timeout-minutes: 4
+        run: |
+          docker compose up --detach
+          sleep 10
+      - name: Stop services
+        timeout-minutes: 1
+        run: |
+          docker compose down --remove-orphans --volumes

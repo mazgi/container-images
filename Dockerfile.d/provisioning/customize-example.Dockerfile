@@ -12,6 +12,24 @@ ENV DOCKER_GID=${DOCKER_GID}
 ENV GID=${GID:-0}
 ENV UID=${UID:-0}
 
+COPY rootfs /
+RUN :\
+  && cd /usr/local/bin\
+  && ln -fs docker-entrypoint.keep-running.zsh echoDebug\
+  && ln -fs docker-entrypoint.keep-running.zsh echoInfo\
+  && ln -fs docker-entrypoint.keep-running.zsh echoWarn\
+  && ln -fs docker-entrypoint.keep-running.zsh echoErr\
+  && ln -fs docker-entrypoint.keep-running.zsh getStatusFilePath\
+  && ln -fs docker-entrypoint.keep-running.zsh updateStatusToSucceeded\
+  && ln -fs docker-entrypoint.keep-running.zsh updateStatusToFailed\
+  && :
+
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.keep-running.zsh" ]
+CMD [ "echoWarn", "This message is the default CMD defined in the Dockerfile." ]
+
+HEALTHCHECK --interval=2s --timeout=1s --retries=2 --start-period=5s\
+ CMD jq -e ". | select(.succeeded)" $(getStatusFilePath)
+
 RUN :\
   # Create a user for development who has the same UID and GID as you.
   && useradd --comment '' --create-home --gid users --uid ${UID} developer\
@@ -28,6 +46,3 @@ RUN :\
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
 # see also: man 7 debconf
 ENV DEBIAN_FRONTEND=
-
-COPY rootfs /
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.start-services.zsh" ]

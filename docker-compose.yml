@@ -88,8 +88,19 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/provisioning
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
+    command:
+      - zsh
+      - -ic
+      - |
+        :
+        echoInfo 'This message is the overwritten CMD defined in the docker-compose.yml.'
+        scripts/cmd.zsh
+    init: true
     user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/provisioning:/workspace
+    working_dir: /workspace
   python-app.development:
     build:
       args:
