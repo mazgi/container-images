@@ -101,9 +101,9 @@ services:
       - zsh
       - -ic
       - |
-        :
-        echoInfo 'This message is the overwritten CMD defined in the docker-compose.yml.'
-        scripts/cmd.zsh
+        docker-util.keep-running.zsh --reset-status
+        docker-util.keep-running.zsh --record-success
+        docker-util.keep-running.zsh --wait-signals
     init: true
     user: "${UID:-0}:${GID:-0}"
     volumes:

@@ -15,20 +15,14 @@ ENV UID=${UID:-0}
 COPY rootfs /
 RUN :\
   && cd /usr/local/bin\
-  && ln -fs docker-entrypoint.keep-running.zsh echoDebug\
-  && ln -fs docker-entrypoint.keep-running.zsh echoInfo\
-  && ln -fs docker-entrypoint.keep-running.zsh echoWarn\
-  && ln -fs docker-entrypoint.keep-running.zsh echoErr\
-  && ln -fs docker-entrypoint.keep-running.zsh getStatusFilePath\
-  && ln -fs docker-entrypoint.keep-running.zsh updateStatusToSucceeded\
-  && ln -fs docker-entrypoint.keep-running.zsh updateStatusToFailed\
+  && ln -fs echo-with-color.zsh echoDebug\
+  && ln -fs echo-with-color.zsh echoInfo\
+  && ln -fs echo-with-color.zsh echoWarn\
+  && ln -fs echo-with-color.zsh echoErr\
   && :
 
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.keep-running.zsh" ]
-CMD [ "echoWarn", "This message is the default CMD defined in the Dockerfile." ]
-
 HEALTHCHECK --interval=2s --timeout=1s --retries=2 --start-period=5s\
- CMD jq -e ". | select(.succeeded)" $(getStatusFilePath)
+ CMD jq -e ". | select(.succeeded)" $(docker-util.keep-running.zsh --print-status-file-path)
 
 RUN :\
   # Create a user for development who has the same UID and GID as you.
@@ -40,7 +34,8 @@ RUN :\
   && usermod --append --groups docker developer 2> /dev/null || true\
   # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
-  && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer
+  && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer\
+  && :
 
 # Reset DEBIAN_FRONTEND to default(`dialog`).
 # If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
