@@ -16,6 +16,7 @@ services:
         npm audit fix
         sort-package-json
         npm run test
+    init: true
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
@@ -35,6 +36,7 @@ services:
       - -c
       - |
         dotnet test --logger:"console;verbosity=detailed" test/
+    init: true
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
@@ -56,6 +58,7 @@ services:
         echo npm install
     environment:
       - FIREBASE_TOKEN
+    init: true
     ports:
       - "${BIND_IP_ADDR:-127.0.0.1}:3000:3000"
       # see https://firebase.google.com/docs/emulator-suite/install_and_configure#port_configuration
@@ -87,6 +90,7 @@ services:
         npm audit fix
         sort-package-json
         npm run test
+    init: true
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
@@ -128,6 +132,7 @@ services:
       - |
         pip install -e .\[test\]
         python -m pytest --cov --pycodestyle module
+    init: true
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
@@ -141,6 +146,7 @@ services:
         UID: ${UID:-0}
       context: Dockerfile.d/ruby-webapp.development
       dockerfile: customize-example.Dockerfile
+    init: true
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
