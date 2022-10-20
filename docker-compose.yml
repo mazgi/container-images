@@ -8,7 +8,8 @@ services:
       dockerfile: with-user.Dockerfile
     command:
       - zsh
-      - -lc
+      - --login
+      - -c
       - |
         npm-check-updates --upgrade
         npm install
@@ -30,7 +31,8 @@ services:
       dockerfile: with-user.Dockerfile
     command:
       - zsh
-      - -lc
+      - --login
+      - -c
       - |
         dotnet test --logger:"console;verbosity=detailed" test/
     profiles:
@@ -48,7 +50,8 @@ services:
       dockerfile: with-user.Dockerfile
     command:
       - zsh
-      - -lc
+      - --login
+      - -c
       - |
         echo npm install
     environment:
@@ -76,7 +79,8 @@ services:
       dockerfile: with-user.Dockerfile
     command:
       - zsh
-      - -lc
+      - --login
+      - -c
       - |
         npm-check-updates --upgrade
         npm install
@@ -99,7 +103,8 @@ services:
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
-      - -ic
+      - --login
+      - -c
       - |
         docker-util.keep-running.zsh --reset-status
         docker-util.keep-running.zsh --record-success
@@ -118,7 +123,8 @@ services:
       dockerfile: with-user.Dockerfile
     command:
       - zsh
-      - -lc
+      - --login
+      - -c
       - |
         pip install -e .\[test\]
         python -m pytest --cov --pycodestyle module
