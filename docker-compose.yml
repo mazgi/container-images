@@ -5,7 +5,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/debian-node-webapp.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     command:
       - zsh
       - --login
@@ -28,7 +28,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/dotnet-app.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     command:
       - zsh
       - --login
@@ -47,7 +47,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/node-firebase.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     command:
       - zsh
       - --login
@@ -76,7 +76,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/node-webapp.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     command:
       - zsh
       - --login
@@ -120,7 +120,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/python-app.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     command:
       - zsh
       - --login
@@ -140,7 +140,7 @@ services:
         GID: ${GID:-0}
         UID: ${UID:-0}
       context: Dockerfile.d/ruby-webapp.development
-      dockerfile: with-user.Dockerfile
+      dockerfile: customize-example.Dockerfile
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"

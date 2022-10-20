@@ -1,6 +1,6 @@
 FROM ghcr.io/mazgi/node-webapp.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/with-user.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/customize-example.Dockerfile"
 
 ARG GID=0
 ARG UID=0

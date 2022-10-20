@@ -1,6 +1,6 @@
-FROM ghcr.io/mazgi/python-app.development
+FROM ghcr.io/mazgi/ruby-webapp.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/python-app.development/with-user.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/ruby-webapp.development/customize-example.Dockerfile"
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
