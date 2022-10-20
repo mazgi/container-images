@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
 
-ARG ANSIBLE_VERSION=6.1.0
+ARG ANSIBLE_VERSION=6.4.0
 ENV ANSIBLE_VERSION=${ANSIBLE_VERSION}
 ARG OP_VERSION=1.12.4
 ENV OP_VERSION=${OP_VERSION}
