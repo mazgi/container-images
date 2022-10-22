@@ -1,9 +1,13 @@
 name: publish-docker-images
-# See: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths
+
 on:
   push:
+    # See: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-including-paths
+    # > If at least one path matches a pattern in the paths filter, the workflow runs.
     paths:
+      - ".github/workflows/*.yml"
       - "Dockerfile.d/**"
+  workflow_dispatch:
 
 jobs:
   detect:
