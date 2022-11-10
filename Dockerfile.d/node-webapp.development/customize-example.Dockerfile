@@ -13,11 +13,10 @@ HEALTHCHECK --interval=2s --timeout=1s --start-period=4s --retries=2\
  CMD curl --fail --output /dev/null --silent ${HEALTHCHECK_URL}
 
 RUN :\
-  # Create a user for development who has the same UID and GID as you.
+  # Create the development user with the same UID and GID as you.
   && useradd --comment '' --create-home --gid users --uid ${UID} developer\
-  && groupadd --gid ${GID} developer\
-  && usermod --append --groups developer developer || true\
-  # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
+  && groupadd --gid ${GID} developer || true\
+  && usermod --append --groups ${GID} developer || true\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer\
   && :

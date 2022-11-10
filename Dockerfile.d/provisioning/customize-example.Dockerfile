@@ -25,14 +25,13 @@ HEALTHCHECK --interval=2s --timeout=1s --retries=2 --start-period=5s\
  CMD jq -e ". | select(.succeeded)" $(docker-util.keep-running.zsh --print-status-file-path)
 
 RUN :\
-  # Create a user for development who has the same UID and GID as you.
+  # Create the development user with the same UID and GID as you.
   && useradd --comment '' --create-home --gid users --uid ${UID} developer\
-  && groupadd --gid ${GID} developer\
-  && usermod --append --groups developer developer || true\
+  && groupadd --gid ${GID} developer || true\
+  && usermod --append --groups ${GID} developer || true\
   # Append docker group
   && bash -c "test -n \"${DOCKER_GID}\" && groupadd --gid ${DOCKER_GID} docker"\
   && usermod --append --groups docker developer 2> /dev/null || true\
-  # It will be duplicate UID or GID with "node" user when your UID==1000 or GID==100.
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer\
   && :
