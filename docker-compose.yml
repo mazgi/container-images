@@ -97,27 +97,6 @@ services:
     volumes:
       - ./code-stubs/node-webapp:/project/workspace
     working_dir: /project/workspace
-  provisioning:
-    build:
-      args:
-        DOCKER_GID: ${DOCKER_GID}
-        GID: ${GID:-0}
-        UID: ${UID:-0}
-      context: Dockerfile.d/provisioning
-      dockerfile: customize-example.Dockerfile
-    command:
-      - zsh
-      - --login
-      - -c
-      - |
-        docker-util.keep-running.zsh --reset-status
-        docker-util.keep-running.zsh --record-success
-        docker-util.keep-running.zsh --wait-signals
-    init: true
-    user: "${UID:-0}:${GID:-0}"
-    volumes:
-      - ./code-stubs/provisioning:/workspace
-    working_dir: /workspace
   python-app.development:
     build:
       args:
