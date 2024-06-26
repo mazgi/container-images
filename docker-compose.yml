@@ -130,4 +130,3 @@ services:
     profiles:
       - disabled
     user: "${UID:-0}:${GID:-0}"
-version: "3.8"
