@@ -1,13 +1,13 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: "node",
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        tsconfig: "tsconfig.json",
+      },
+    ],
   },
-  globals: {
-    'ts-jest': {
-      tsConfig: 'tsconfig.json'
-    }
-  },
-  moduleDirectories: ['node_modules', 'src'],
-  verbose: true
-}
+  moduleDirectories: ["node_modules", "src"],
+  verbose: true,
+};
