@@ -1,4 +1,29 @@
 services:
+  node-webapp.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/node-webapp.development
+      dockerfile: customize-example.Dockerfile
+    command:
+      - zsh
+      - --login
+      - -c
+      - |
+        npm-check-updates --upgrade
+        npm install
+        npm audit fix
+        sort-package-json
+        npm run test
+    init: true
+    user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs:/workspace/code-stubs
+    working_dir: /workspace/code-stubs/node-webapp
+
+# ====
+
   debian-node-webapp.development:
     build:
       args:
@@ -73,30 +98,6 @@ services:
     volumes:
       - .:/workspace
     working_dir: /workspace
-  node-webapp.development:
-    build:
-      args:
-        GID: ${GID:-0}
-        UID: ${UID:-0}
-      context: Dockerfile.d/node-webapp.development
-      dockerfile: customize-example.Dockerfile
-    command:
-      - zsh
-      - --login
-      - -c
-      - |
-        npm-check-updates --upgrade
-        npm install
-        npm audit fix
-        sort-package-json
-        npm run test
-    init: true
-    profiles:
-      - disabled
-    user: "${UID:-0}:${GID:-0}"
-    volumes:
-      - ./code-stubs/node-webapp:/project/workspace
-    working_dir: /project/workspace
   python-app.development:
     build:
       args:
