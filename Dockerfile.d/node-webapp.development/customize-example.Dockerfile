@@ -1,13 +1,11 @@
 FROM ghcr.io/mazgi/node-webapp.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/customize-example.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-webapp.development/customize-example.Dockerfile"
 
 ARG GID=0
 ARG UID=0
 ARG HEALTHCHECK_URL="http://localhost/status"
-ENV GID=${GID:-0}
-ENV UID=${UID:-0}
-ENV HEALTHCHECK_URL=${HEALTHCHECK_URL:-"http://localhost/status"}
+ENV HEALTHCHECK_URL=${HEALTHCHECK_URL}
 
 HEALTHCHECK --interval=2s --timeout=1s --start-period=4s --retries=2\
  CMD curl --fail --output /dev/null --silent ${HEALTHCHECK_URL}
