@@ -26,8 +26,7 @@ jobs:
     needs:
       - set-environment-variable-as-vars
     secrets: inherit
-    # uses: mazgi/container-images/.github/workflows/_start-stop-the-container.yaml@main
-    uses: mazgi/dockerfiles/.github/workflows/_start-stop-the-container.yaml@main
+    uses: ./.github/workflows/_start-stop-the-container.yaml
     with:
       compose-service-name: "${{ needs.set-environment-variable-as-vars.outputs.image-name }}"
   publish-containers:
@@ -35,7 +34,6 @@ jobs:
     needs:
       - set-environment-variable-as-vars
     secrets: inherit
-    # uses: mazgi/container-images/.github/workflows/_publish-the-container-image.yaml@main
-    uses: mazgi/dockerfiles/.github/workflows/_publish-the-container-image.yaml@main
+    uses: ./.github/workflows/_publish-the-container-image.yaml
     with:
       image-name: "${{ needs.set-environment-variable-as-vars.outputs.image-name }}"
