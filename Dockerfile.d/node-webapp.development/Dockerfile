@@ -1,16 +1,17 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
-LABEL maintainer="docker@mazgi.com"
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
 
-ARG NODE_VERSION=18
-ENV NODE_VERSION=${NODE_VERSION:-18}
-
+# https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
+ARG TARGETARCH
+ARG TARGETPLATFORM
 # Set in non-interactive mode.
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN :\
-  && echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
+ARG NODE_VERSION=20
+WORKDIR /workspace
+
+RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
 #   && :
 # RUN :\
@@ -21,21 +22,8 @@ RUN :\
 #   && :
 # RUN :\
   && : Install basic packages\
-  && apt-get install --assume-yes\
-  apt-transport-https\
-  apt-utils\
-  ca-certificates\
-  curl\
-  dnsutils\
-  git\
-  gnupg\
-  gnupg2\
-  jq\
-  openssh-client\
-  software-properties-common\
-  sudo\
-  unzip\
-  zsh\
+  && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
+  && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
 #   && :
 # RUN :\
   && : Install middleware clients\
@@ -43,7 +31,8 @@ RUN :\
 #   && :
 # RUN :\
   && : Install Node.js ${NODE_VERSION}\
-  && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -\
+  && curl --fail --silent --show-error --location "https://deb.nodesource.com/setup_${NODE_VERSION}.x"\
+  | bash -\
   && apt-get install -y nodejs\
 #   && :
 # RUN :\
@@ -59,9 +48,9 @@ RUN :\
 #   && :
 # RUN :\
   && : Install starship\
-  && curl "https://starship.rs/install.sh" -o "/tmp/install.sh"\
-  && sh /tmp/install.sh --yes\
-  && rm -rf /tmp/install.sh\
+  && curl --output "/tmp/starship.install.sh" --fail --silent --show-error --location "https://starship.rs/install.sh"\
+  && sh /tmp/starship.install.sh --yes\
+  && rm -f /tmp/starship.install.sh\
 #   && :
 # RUN :\
   && : Clean up\
@@ -71,8 +60,3 @@ RUN :\
   && rm -rf /var/lib/apt/\
   && rm -rf /var/log/*\
   && :
-
-COPY rootfs /
-
-# Set in non-interactive mode.
-ENV DEBIAN_FRONTEND=noninteractive

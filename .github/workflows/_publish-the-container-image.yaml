@@ -1,0 +1,71 @@
+name: publish-the-container-image
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        required: true
+        type: string
+      language-versions-csv:
+        description: "The programming language versions such as: 16,18,20"
+        type: string
+
+jobs:
+  build-and-push-the-image:
+    env:
+      REGISTRY_PREFIX: null
+      TAG_SUFFIX: null
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      #
+      # Generate the docker tag prefix with the registry - ghcr.io
+      - name: Generate tag prefix for ghcr.io
+        run: |
+          echo REGISTRY_PREFIX="ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
+      #
+      # Generate the docker tag suffix
+      - name: Generate the docker tag suffix using the git tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo TAG_SUFFIX="${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Generate the docker tag suffix using the current date
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          echo TAG_SUFFIX="$(date +%Y%m-)${GITHUB_SHA::7}" >> $GITHUB_ENV
+      #
+      # Set up the Docker build environment
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      #
+      # Build the images
+      # See also:
+      #   - https://docs.docker.com/reference/cli/docker/buildx/build/#output
+      #   - https://docs.docker.com/reference/cli/docker/buildx/build/#platform
+      #   - https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
+      - name: Build and push the image if git-refs is the default(main) branch or starts with a version tag
+        if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+        timeout-minutes: 180
+        uses: docker/build-push-action@v6
+        with:
+          context: Dockerfile.d/${{ inputs.image-name }}/
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}:latest,${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}:${{ env.TAG_SUFFIX }}
+      - name: If the git-refs isn't the default branch or doesn't start with a version tag, just build only the image
+        if: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v') }}
+        timeout-minutes: 180
+        uses: docker/build-push-action@v6
+        with:
+          context: Dockerfile.d/${{ inputs.image-name }}/
+          platforms: linux/amd64,linux/arm64
+          push: false
+          tags: null.invalid/${{ inputs.image-name }}:latest
