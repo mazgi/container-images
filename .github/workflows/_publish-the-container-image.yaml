@@ -6,16 +6,41 @@ on:
       image-name:
         required: true
         type: string
+      language-version-arg-key:
+        description: "The programming language version build arg such as: NODE_VERSION"
+        type: string
       language-versions-csv:
         description: "The programming language versions such as: 16,18,20"
         type: string
 
 jobs:
-  build-and-push-the-image:
+  parse-csv-inputs:
     env:
+      LANGUAGE_VERSIONS_CSV: null
+    runs-on: ubuntu-latest
+    outputs:
+      language-versions-json: ${{ steps.set-outputs.outputs.language-versions-json }}
+    steps:
+      - id: set-outputs
+        name: set-outputs
+        run: |
+          _QUOTED="\"$(echo ${{ inputs.language-versions-csv }} | sed 's/,/","/g')\""
+          echo "language-versions-json=[${_QUOTED}]" >> $GITHUB_OUTPUT
+  build-image:
+    env:
+      PLATFORM_PAIR: null
       REGISTRY_PREFIX: null
       TAG_SUFFIX: null
+    needs:
+      - parse-csv-inputs
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
+        language-version: ${{ fromJson(needs.parse-csv-inputs.outputs.language-versions-json) }}
     steps:
       - uses: actions/checkout@v4
       #
@@ -39,33 +64,112 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Login to ghcr.io
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       #
       # Build the images
       # See also:
       #   - https://docs.docker.com/reference/cli/docker/buildx/build/#output
       #   - https://docs.docker.com/reference/cli/docker/buildx/build/#platform
       #   - https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
-      - name: Build and push the image if git-refs is the default(main) branch or starts with a version tag
-        if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
-        timeout-minutes: 180
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}
+      #
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push by digest
+        id: build
         uses: docker/build-push-action@v6
         with:
+          build-args: ${{ inputs.language-version-arg-key }}=${{ matrix.language-version }}
           context: Dockerfile.d/${{ inputs.image-name }}/
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}:latest,${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}:${{ env.TAG_SUFFIX }}
-      - name: If the git-refs isn't the default branch or doesn't start with a version tag, just build only the image
-        if: ${{ github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v') }}
-        timeout-minutes: 180
-        uses: docker/build-push-action@v6
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }},push-by-digest=true,name-canonical=true,push=true
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+      - name: Generate artifact name
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
         with:
-          context: Dockerfile.d/${{ inputs.image-name }}/
-          platforms: linux/amd64,linux/arm64
-          push: false
-          tags: null.invalid/${{ inputs.image-name }}:latest
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+  merge-images:
+    env:
+      REGISTRY_PREFIX: null
+      TAG_SUFFIX: null
+    needs:
+      - parse-csv-inputs
+      - build-image
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language-version: ${{ fromJson(needs.parse-csv-inputs.outputs.language-versions-json) }}
+    steps:
+      #
+      # Generate the docker tag prefix with the registry - ghcr.io
+      - name: Generate tag prefix for ghcr.io
+        run: |
+          echo REGISTRY_PREFIX="ghcr.io/${{ github.repository_owner }}" >> $GITHUB_ENV
+      #
+      # Generate the docker tag suffix
+      - name: Generate the docker tag suffix using the git tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo TAG_SUFFIX="${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Generate the docker tag suffix using the current date
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          echo TAG_SUFFIX="$(date +%Y%m-)${GITHUB_SHA::7}" >> $GITHUB_ENV
+      #
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # Set Docker tags
+      #   - https://github.com/docker/metadata-action?tab=readme-ov-file#latest-tag
+      #   - https://github.com/docker/metadata-action?tab=readme-ov-file#typesemver
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}},enable=${{ matrix.language-version == '' }}
+            type=raw,value=${{ matrix.language-version }},enable={{is_default_branch}},enable=${{ matrix.language-version != '' }}
+            type=semver,pattern={{version}}
+            type=raw,value={{date 'YYYYMM'}}-{{sha}},enable=${{ !startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}@sha256:%s ' *)
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}:${{ steps.meta.outputs.version }}
