@@ -8,9 +8,11 @@ on:
         type: string
       language-version-arg-key:
         description: "The programming language version build arg such as: NODE_VERSION"
+        required: true
         type: string
       language-versions-csv:
-        description: "The programming language versions such as: 16,18,20"
+        description: "The programming language versions such as: 18,20,22"
+        required: true
         type: string
 
 jobs:
