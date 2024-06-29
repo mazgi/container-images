@@ -157,8 +157,9 @@ jobs:
           images: |
             ${{ env.REGISTRY_PREFIX }}/${{ inputs.image-name }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}},enable=${{ matrix.language-version == '' }}
-            type=raw,value=${{ matrix.language-version }},enable={{is_default_branch}},enable=${{ matrix.language-version != '' }}
+            # Enable `latest` tag when the branch is default and the language version is first on versions list.
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && (inputs.language-versions-csv == matrix.language-version || startsWith(inputs.language-versions-csv, join(matrix.language-version, ','))) }}
+            type=raw,value=${{ matrix.language-version }},enable={{is_default_branch}}
             type=semver,pattern={{version}}
             type=raw,value={{date 'YYYYMM'}}-{{sha}},enable=${{ !startsWith(github.ref, 'refs/tags/v') }}
 
