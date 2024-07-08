@@ -1,8 +1,11 @@
 # container-images
 
-[![publish-node-webapp-development-container-images](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml)
-
 My Dockerfile and related resources.
+
+Language|Build Status|Container Images
+---|---|---
+Go|[![publish-go-app-development-container-images](https://github.com/mazgi/container-images/actions/workflows/publish-go-app-development-container-images.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/publish-go-app-development-container-images.yaml)|[ghcr.io/mazgi/go-app.development](https://github.com/mazgi/container-images/pkgs/container/go-app.development)
+Node.js|[![publish-node-webapp-development-container-images](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml)|[ghcr.io/mazgi/node-webapp.development](https://github.com/mazgi/container-images/pkgs/container/node-webapp.development)
 
 ## How to Use
 
