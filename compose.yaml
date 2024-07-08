@@ -11,8 +11,7 @@ services:
       - --login
       - -c
       - |
-        go test
-        sleep infinity
+        go-inotifywait
     environment:
       - ENV_UNIQUE_ID
     init: true
