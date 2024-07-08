@@ -1,4 +1,25 @@
 services:
+  go-app.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfile.d/go-app.development
+      dockerfile: customize-example.Dockerfile
+    command:
+      - zsh
+      - --login
+      - -c
+      - |
+        go test
+        sleep infinity
+    environment:
+      - ENV_UNIQUE_ID
+    init: true
+    user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/go-app/workspace:/workspace
+    working_dir: /workspace/http-ok-whatever
   node-webapp.development:
     build:
       args:
@@ -22,7 +43,7 @@ services:
       - ./code-stubs:/workspace/code-stubs
     working_dir: /workspace/code-stubs/node-webapp
 
-# ====
+  # ====
 
   debian-node-webapp.development:
     build:
