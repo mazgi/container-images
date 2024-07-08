@@ -1,7 +1,7 @@
 FROM node:12 as base
 
 LABEL maintainer="docker@mazgi.com"
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/node-firebase.development/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-firebase.development/Dockerfile"
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive

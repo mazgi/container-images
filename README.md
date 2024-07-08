@@ -1,6 +1,6 @@
-# dockerfiles
+# container-images
 
-[![publish-node-webapp-development-container-images](https://github.com/mazgi/dockerfiles/actions/workflows/publish-node-webapp-development-container-images.yaml/badge.svg)](https://github.com/mazgi/dockerfiles/actions/workflows/publish-node-webapp-development-container-images.yaml)
+[![publish-node-webapp-development-container-images](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/publish-node-webapp-development-container-images.yaml)
 
 My Dockerfile and related resources.
 

@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0
 
 LABEL maintainer="docker@mazgi.com"
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/dotnet-app.development/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/dotnet-app.development/Dockerfile"
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive

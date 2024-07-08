@@ -41,7 +41,7 @@ setuptools.setup(
     },
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/mazgi/dockerfiles",
+    url="https://github.com/mazgi/container-images",
     packages=setuptools.find_packages(
         exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[],

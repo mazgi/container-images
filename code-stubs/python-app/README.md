@@ -1,4 +1,4 @@
-# mazgi/dockerfiles Python Stub App
+# mazgi/container-images Python Stub App
 
 ### Run
 

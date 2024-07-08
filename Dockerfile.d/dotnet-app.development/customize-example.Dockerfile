@@ -1,6 +1,6 @@
 FROM ghcr.io/mazgi/dotnet-app.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/dockerfiles/blob/main/Dockerfile.d/dotnet-app.development/customize-example.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/dotnet-app.development/customize-example.Dockerfile"
 
 # Set in non-interactive mode.
 ENV DEBIAN_FRONTEND=noninteractive
