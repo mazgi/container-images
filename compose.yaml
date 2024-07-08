@@ -11,7 +11,7 @@ services:
       - --login
       - -c
       - |
-        go-inotifywait
+        go-inotifywait.zsh
     environment:
       - ENV_UNIQUE_ID
     init: true
