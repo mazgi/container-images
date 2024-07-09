@@ -2,5 +2,6 @@
 
 while true
 do
-  inotifywait --recursive --event modify,close_write,move,create,delete . && go test
+  go test
+  inotifywait --recursive --event modify,close_write,move,create,delete .
 done

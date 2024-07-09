@@ -1,14 +1,15 @@
 FROM ubuntu:24.04
 
+LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
 
+# Set in non-interactive mode.
+ARG DEBIAN_FRONTEND=noninteractive
+ARG NODE_VERSION=20
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETPLATFORM
-# Set in non-interactive mode.
-ARG DEBIAN_FRONTEND=noninteractive
 
-ARG NODE_VERSION=20
 WORKDIR /workspace
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
@@ -24,6 +25,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && : Install basic packages\
   && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
   && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
+  && apt-get install --assume-yes vim\
 #   && :
 # RUN :\
   && : Install middleware clients\

@@ -3,20 +3,16 @@ FROM ubuntu:24.04
 LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/go-app.development/Dockerfile"
 
+# Set in non-interactive mode.
+ARG DEBIAN_FRONTEND=noninteractive
 # https://github.com/go-nv/goenv/blob/master/ENVIRONMENT_VARIABLES.md
 # > if GOENV_GOMOD_VERSION_ENABLE is set to 1, it will try to use the project's go.mod file to get the version.
 ENV GOENV_GOMOD_VERSION_ENABLE=1
 # https://go.dev/dl/
 ARG GO_VERSIONS=1.22.5,1.21.12
-
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETPLATFORM
-# Set in non-interactive mode.
-ARG DEBIAN_FRONTEND=noninteractive
-
-ARG GID=0
-ARG UID=0
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
@@ -31,6 +27,7 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   && : Install basic packages\
   && apt-get install --assume-yes sudo apt-utils curl dnsutils git jq openssh-client tmux unzip zsh\
   && apt-get install --assume-yes apt-transport-https ca-certificates gnupg gnupg2 rsync software-properties-common\
+  && apt-get install --assume-yes vim\
   && apt-get install --assume-yes inotify-tools\
 #   && :
 # RUN :\

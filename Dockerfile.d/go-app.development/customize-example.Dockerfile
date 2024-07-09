@@ -2,6 +2,9 @@ FROM ghcr.io/mazgi/go-app.development
 
 LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/go-app.development/customize-example.Dockerfile"
 
+ARG GID=0
+ARG UID=0
+
 HEALTHCHECK --interval=2s --timeout=1s --retries=2 --start-period=5s\
  CMD true
 
