@@ -1,0 +1,57 @@
+name: node-webapp.development
+
+env:
+  IMAGE_BASENAME: ${{ github.workflow }}
+
+on:
+  push:
+    paths:
+      - ".github/workflows/**"
+      - "code-stubs/node-webapp/**"
+      - "Dockerfile.d/node-webapp.development/**"
+  workflow_dispatch:
+
+jobs:
+  parse-config:
+    runs-on: ubuntu-latest
+    outputs:
+      image-basename-string: ${{ steps.set-output-image-basename-string.outputs.image-basename-string }}
+      image-version-arg-key-string: ${{ steps.set-output-image-version-arg-key-string.outputs.image-version-arg-key-string }}
+      strategy-matrix-architectures-json: ${{ steps.set-output-strategy-matrix-architectures-json.outputs.strategy-matrix-architectures-json }}
+      strategy-matrix-versions-json: ${{ steps.set-output-strategy-matrix-versions-json.outputs.strategy-matrix-versions-json }}
+    steps:
+      - uses: actions/checkout@v4
+      # Load the image basename
+      - id: set-output-image-basename-string
+        run: |
+          echo "image-basename-string=${{ env.IMAGE_BASENAME }}" >> $GITHUB_OUTPUT
+      # Load the image version arg key
+      - id: set-output-image-version-arg-key-string
+        run: |
+          _STRING=$(yq --indent=0 --output-format=json --unwrapScalar '.images."${{ env.IMAGE_BASENAME }}".image_version_arg_key' .github/workflows/config/images.yaml)
+          echo "image-version-arg-key-string=${_STRING}" >> $GITHUB_OUTPUT
+      # Load the architectures
+      - id: set-output-strategy-matrix-architectures-json
+        run: |
+          _JSON=$(yq --indent=0 --output-format=json '.images."${{ env.IMAGE_BASENAME }}".architectures' .github/workflows/config/images.yaml)
+          echo "strategy-matrix-architectures-json=${_JSON}" >> $GITHUB_OUTPUT
+      # Load the versions
+      - id: set-output-strategy-matrix-versions-json
+        run: |
+          _JSON=$(\
+          yq --indent=0 --output-format=json\
+           '[.images."${{ env.IMAGE_BASENAME }}".versions.[] | with(select(.latest != true); .latest = false)]'\
+           .github/workflows/config/images.yaml\
+          )
+          echo "strategy-matrix-versions-json=${_JSON}" >> $GITHUB_OUTPUT
+  build-and-publish-container-images:
+    name: publish-containers
+    needs:
+      - parse-config
+    secrets: inherit
+    uses: ./.github/workflows/_build-and-publish-the-container-image.yaml
+    with:
+      image-basename-string: "${{ needs.parse-config.outputs.image-basename-string }}"
+      image-version-arg-key-string: "${{ needs.parse-config.outputs.image-version-arg-key-string }}"
+      strategy-matrix-architectures-json: "${{ needs.parse-config.outputs.strategy-matrix-architectures-json }}"
+      strategy-matrix-versions-json: "${{ needs.parse-config.outputs.strategy-matrix-versions-json }}"

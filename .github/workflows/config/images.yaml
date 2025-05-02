@@ -1,0 +1,12 @@
+images:
+  node-webapp.development:
+    image_version_arg_key: NODE_VERSION
+    versions:
+      - version: "22"
+        latest: true
+      - version: "20"
+    architectures:
+      - platform: linux/amd64
+        runner: ubuntu-24.04
+      - platform: linux/arm64
+        runner: ubuntu-24.04-arm

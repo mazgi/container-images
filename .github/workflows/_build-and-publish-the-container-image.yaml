@@ -1,0 +1,109 @@
+name: build-and-publish-the-container-image
+
+env:
+  IMAGE_PREFIX: ""
+
+on:
+  workflow_call:
+    inputs:
+      image-basename-string:
+        description: "The image basename such as: ubuntu, gentoo"
+        required: true
+        type: string
+      image-version-arg-key-string:
+        description: "The image version build arg such as: NODE_VERSION"
+        required: true
+        type: string
+      strategy-matrix-architectures-json:
+        description: 'The image build architecture and github runner JSON string, such as: [{"arch":"linux/amd64","runner":"ubuntu-24.04"}]'
+        required: true
+        type: string
+      strategy-matrix-versions-json:
+        description: 'The image versions JSON string, such as: [{"version":2,"latest":true}]'
+        required: true
+        type: string
+
+jobs:
+  build-and-push-each-image:
+    strategy:
+      matrix:
+        arch: ${{ fromJSON(inputs.strategy-matrix-architectures-json )}}
+        version: ${{ fromJSON(inputs.strategy-matrix-versions-json )}}
+    runs-on: ${{ matrix.arch.runner }}
+    steps:
+      - id: docker-metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_PREFIX }}${{ inputs.image-basename-string }}
+      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Push docker image digest
+        id: build-and-push-image
+        uses: docker/build-push-action@v6
+        with:
+          build-args: ${{ inputs.image-version-arg-key-string }}=${{ matrix.version.version }}
+          context: Dockerfile.d/${{ inputs.image-basename-string }}/
+          labels: ${{ steps.docker-metadata.outputs.labels }}
+          platforms: ${{ matrix.arch.platform }}
+          provenance: false
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_PREFIX }}${{ inputs.image-basename-string }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests/${{ matrix.version.version }}/
+          digest="${{ steps.build-and-push-image.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${{ matrix.version.version }}/${digest#sha256:}"
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.version.version }}-${{ matrix.arch.runner }}
+          path: ${{ runner.temp }}/digests/${{ matrix.version.version }}/*
+          if-no-files-found: error
+          retention-days: 1
+  merge-and-push-digests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJSON(inputs.strategy-matrix-versions-json )}}
+    needs:
+      - build-and-push-each-image
+    steps:
+      - name: Download digests each version
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests/${{ matrix.version.version }}/
+          pattern: digests-${{ matrix.version.version }}-*
+          merge-multiple: true
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - id: docker-metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_PREFIX }}${{ inputs.image-basename-string }}
+          tags: |
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+            type=semver,pattern={{version}}
+            type=sha
+            type=raw,value=${{ matrix.version.version }},enable={{is_default_branch}}
+            # Enable `latest` tag when the branch is default and the version is latest.
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') && matrix.version.latest }}
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests/${{ matrix.version.version }}/
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+           $(printf 'ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_PREFIX }}${{ inputs.image-basename-string }}@sha256:%s ' *)
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_PREFIX }}${{ inputs.image-basename-string }}:${{ steps.docker-metadata.outputs.version }}
