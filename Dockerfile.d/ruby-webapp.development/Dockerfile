@@ -5,7 +5,7 @@ LABEL maintainer="docker@mazgi.com"
 LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/ruby-webapp.development/Dockerfile"
 
 # Set in non-interactive mode.
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-recommends\
   && apt-get update\
@@ -24,8 +24,3 @@ RUN echo 'apt::install-recommends "false";' > /etc/apt/apt.conf.d/no-install-rec
   # 
   # Place empty .zshrc
   && touch /etc/skel/.zshrc
-
-# Reset DEBIAN_FRONTEND to default(`dialog`).
-# If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
-# see also: man 7 debconf
-ENV DEBIAN_FRONTEND=

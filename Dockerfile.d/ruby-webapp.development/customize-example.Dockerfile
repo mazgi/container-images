@@ -3,7 +3,7 @@ FROM ghcr.io/mazgi/ruby-webapp.development
 LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/ruby-webapp.development/customize-example.Dockerfile"
 
 # Set in non-interactive mode.
-ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 ARG GID=0
 ARG UID=0
@@ -18,8 +18,3 @@ RUN :\
   && echo '%users ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-users\
   && echo '%developer ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/grant-all-without-password-to-developer\
   && :
-
-# Reset DEBIAN_FRONTEND to default(`dialog`).
-# If you no need `dialog`, you can set `DEBIAN_FRONTEND=readline`.
-# see also: man 7 debconf
-ENV DEBIAN_FRONTEND=
