@@ -2,9 +2,10 @@
 
 My Dockerfile and related resources.
 
-Language|Build Status|Container Images
----|---|---
-Node.js|[![node-webapp.development](https://github.com/mazgi/container-images/actions/workflows/node-webapp.development.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/node-webapp.development.yaml)|[ghcr.io/mazgi/node-webapp.development](https://github.com/mazgi/container-images/pkgs/container/node-webapp.development)
+| Language | Build Status                                                                                                                                                                                                               | Container Images                                                                                                          |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Go       | [![go-app.development](https://github.com/mazgi/container-images/actions/workflows/go-app.development.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/go-app.development.yaml)                | [ghcr.io/mazgi/go-app.development](https://github.com/mazgi/container-images/pkgs/container/go-app.development)           |
+| Node.js  | [![node-webapp.development](https://github.com/mazgi/container-images/actions/workflows/node-webapp.development.yaml/badge.svg)](https://github.com/mazgi/container-images/actions/workflows/node-webapp.development.yaml) | [ghcr.io/mazgi/node-webapp.development](https://github.com/mazgi/container-images/pkgs/container/node-webapp.development) |
 
 ## How to Use
 
