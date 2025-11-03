@@ -1,4 +1,4 @@
-name: node-webapp.development
+name: go-app.development
 
 env:
   IMAGE_BASENAME: ${{ github.workflow }}
