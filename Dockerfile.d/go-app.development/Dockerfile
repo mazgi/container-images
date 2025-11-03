@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # > if GOENV_GOMOD_VERSION_ENABLE is set to 1, it will try to use the project's go.mod file to get the version.
 ENV GOENV_GOMOD_VERSION_ENABLE=1
 # https://go.dev/dl/
-ARG GO_VERSIONS=1.22.5,1.21.12
+ARG GO_VERSIONS=1.25.3,1.24.9
 # https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 ARG TARGETARCH
 ARG TARGETPLATFORM
