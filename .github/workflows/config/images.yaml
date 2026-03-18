@@ -2,8 +2,9 @@ images:
   go-app.development:
     image_version_arg_key: GO_VERSIONS
     versions:
-      - version: "1.25.3"
+      - version: "1.26.1"
         latest: true
+      - version: "1.25.8"
     architectures:
       - platform: linux/amd64
         runner: ubuntu-24.04
@@ -12,8 +13,9 @@ images:
   node-webapp.development:
     image_version_arg_key: NODE_VERSION
     versions:
-      - version: "22"
+      - version: "24"
         latest: true
+      - version: "22"
       - version: "20"
     architectures:
       - platform: linux/amd64
