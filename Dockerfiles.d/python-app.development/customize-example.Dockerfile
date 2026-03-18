@@ -1,6 +1,6 @@
-FROM ghcr.io/mazgi/debian-node-webapp.development
+FROM ghcr.io/mazgi/python-app.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/debian-node-webapp.development/customize-example.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/python-app.development/customize-example.Dockerfile"
 
 # Set in non-interactive mode.
 ARG DEBIAN_FRONTEND=noninteractive

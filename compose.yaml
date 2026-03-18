@@ -4,7 +4,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/go-app.development
+      context: Dockerfiles.d/go-app.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -24,7 +24,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/node-webapp.development
+      context: Dockerfiles.d/node-webapp.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -49,7 +49,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/debian-node-webapp.development
+      context: Dockerfiles.d/debian-node-webapp.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -73,7 +73,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/dotnet-app.development
+      context: Dockerfiles.d/dotnet-app.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -93,7 +93,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/node-firebase.development
+      context: Dockerfiles.d/node-firebase.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -123,7 +123,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/python-app.development
+      context: Dockerfiles.d/python-app.development
       dockerfile: customize-example.Dockerfile
     command:
       - zsh
@@ -144,7 +144,7 @@ services:
       args:
         GID: ${GID:-0}
         UID: ${UID:-0}
-      context: Dockerfile.d/ruby-webapp.development
+      context: Dockerfiles.d/ruby-webapp.development
       dockerfile: customize-example.Dockerfile
     init: true
     profiles:

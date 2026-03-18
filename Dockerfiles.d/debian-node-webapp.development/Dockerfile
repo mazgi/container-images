@@ -1,7 +1,7 @@
 FROM node:16 AS base
 
 LABEL maintainer="docker@mazgi.com"
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/debian-node-webapp.development.development/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/debian-node-webapp.development.development/Dockerfile"
 
 # Set in non-interactive mode.
 ARG DEBIAN_FRONTEND=noninteractive

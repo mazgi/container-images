@@ -1,12 +1,14 @@
-FROM ghcr.io/mazgi/go-app.development
+FROM ghcr.io/mazgi/debian-node-webapp.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/go-app.development/customize-example.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/debian-node-webapp.development/customize-example.Dockerfile"
+
+# Set in non-interactive mode.
+ARG DEBIAN_FRONTEND=noninteractive
 
 ARG GID=0
 ARG UID=0
-
-HEALTHCHECK --interval=2s --timeout=1s --retries=2 --start-period=5s\
- CMD true
+ENV GID=${GID:-0}
+ENV UID=${UID:-0}
 
 RUN :\
   # Create a user for development who has the same UID and GID as you.

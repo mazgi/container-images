@@ -1,6 +1,6 @@
-FROM ghcr.io/mazgi/dotnet-app.development
+FROM ghcr.io/mazgi/node-firebase.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/dotnet-app.development/customize-example.Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/node-firebase.development/customize-example.Dockerfile"
 
 # Set in non-interactive mode.
 ARG DEBIAN_FRONTEND=noninteractive

@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 
 LABEL maintainer="docker@mazgi.com"
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-webapp.development/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/node-webapp.development/Dockerfile"
 
 # Set in non-interactive mode.
 ARG DEBIAN_FRONTEND=noninteractive

@@ -1,14 +1,14 @@
-FROM ghcr.io/mazgi/node-firebase.development
+FROM ghcr.io/mazgi/node-webapp.development
 
-LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfile.d/node-firebase.development/customize-example.Dockerfile"
-
-# Set in non-interactive mode.
-ARG DEBIAN_FRONTEND=noninteractive
+LABEL org.opencontainers.image.source="https://github.com/mazgi/container-images/blob/main/Dockerfiles.d/node-webapp.development/customize-example.Dockerfile"
 
 ARG GID=0
 ARG UID=0
-ENV GID=${GID:-0}
-ENV UID=${UID:-0}
+ARG HEALTHCHECK_URL="http://localhost/status"
+ENV HEALTHCHECK_URL=${HEALTHCHECK_URL}
+
+HEALTHCHECK --interval=2s --timeout=1s --start-period=4s --retries=2\
+ CMD curl --fail --output /dev/null --silent ${HEALTHCHECK_URL}
 
 RUN :\
   # Create a user for development who has the same UID and GID as you.

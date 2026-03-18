@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-args: ${{ inputs.image-version-arg-key-string }}=${{ matrix.version.version }}
-          context: Dockerfile.d/${{ inputs.image-basename-string }}/
+          context: Dockerfiles.d/${{ inputs.image-basename-string }}/
           labels: ${{ steps.docker-metadata.outputs.labels }}
           platforms: ${{ matrix.arch.platform }}
           provenance: false
