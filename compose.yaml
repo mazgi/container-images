@@ -41,6 +41,24 @@ services:
     volumes:
       - ./code-stubs:/workspace/code-stubs
     working_dir: /workspace/code-stubs/node-webapp
+  rust-app.development:
+    build:
+      args:
+        GID: ${GID:-0}
+        UID: ${UID:-0}
+      context: Dockerfiles.d/rust-app.development
+      dockerfile: customize-example.Dockerfile
+    command:
+      - zsh
+      - --login
+      - -c
+      - |
+        cargo test
+    init: true
+    user: "${UID:-0}:${GID:-0}"
+    volumes:
+      - ./code-stubs/rust-app/workspace:/workspace
+    working_dir: /workspace
 
   # ====
 
